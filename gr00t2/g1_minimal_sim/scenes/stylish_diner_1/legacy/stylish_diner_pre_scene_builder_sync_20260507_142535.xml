@@ -1,0 +1,142 @@
+<mujoco model="basic_restaurant_open">
+  <compiler angle="degree" coordinate="local"/>
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+
+  <visual>
+    <headlight diffuse="0.65 0.65 0.65" ambient="0.40 0.36 0.32"/>
+    <rgba haze="0.05 0.05 0.05 1"/>
+  </visual>
+
+  <asset>
+    <texture name="wood" type="2d" file="assets/floor/stylish_diner_floor_planks.png"/>
+    <material name="floor_wood" texture="wood" texrepeat="12.5 9.1" reflectance="0" specular="0" shininess="1"/>
+    <material name="wall" rgba="0.72 0.64 0.52 1"/>
+    <material name="dark_metal" rgba="0.10 0.10 0.10 1"/>
+    <material name="bar_wood" rgba="0.34 0.18 0.09 1"/>
+    <material name="booth_red" rgba="0.38 0.08 0.05 1"/>
+    <material name="table_top" rgba="0.25 0.14 0.07 1"/>
+    <material name="felt" rgba="0.05 0.32 0.18 1"/>
+    <material name="blue_target" rgba="0.15 0.35 0.85 1"/>
+    <material name="light_gray" rgba="0.72 0.72 0.72 1"/>
+    <material name="ceramic_white" rgba="0.95 0.95 0.93 1"/>
+  </asset>
+
+  <worldbody>
+    <!-- =========================
+         MAIN FLOOR / ROOM SHELL
+         ========================= -->
+    <geom name="floor" type="box" pos="0 -0.6096 -0.01" size="11 7.9146 0.01" material="floor_wood"/>
+
+    <geom name="back_wall"  type="box" pos="0 6.8 1.6"  size="11 0.12 1.6" material="wall"/>
+    <geom name="left_wall"  type="box" pos="-10.8 -0.6096 1.6" size="0.12 7.9146 1.6" material="wall"/>
+    <geom name="right_low"  type="box" pos="10.8 -0.6096 0.5" size="0.12 7.9146 0.5" material="wall"/>
+
+    <!-- sign board -->
+    <geom name="sign_board" type="box" pos="0 6.65 2.25" size="1.5 0.06 0.35" rgba="0.08 0.06 0.04 1"/>
+
+    <!-- =========================
+         BAR AREA (LEFT, COMPACT)
+         ========================= -->
+    <geom name="bar_long" type="box" pos="-8.2 -0.967 0.55" size="0.45 1.8 0.55" material="bar_wood"/>
+    <geom name="bar_back" type="box" pos="-7.0 0.633 0.55" size="1.2 0.45 0.55" material="bar_wood"/>
+
+    <geom name="stool_1" type="cylinder" pos="-7.35 -2.067 0.35" size="0.22 0.08" material="dark_metal"/>
+    <geom name="stool_2" type="cylinder" pos="-7.35 -1.167 0.35" size="0.22 0.08" material="dark_metal"/>
+    <geom name="stool_3" type="cylinder" pos="-7.35 -0.267 0.35" size="0.22 0.08" material="dark_metal"/>
+
+    <!-- =========================
+         CENTRAL DINING
+         Keep sparse for maneuver room
+         ========================= -->
+    <geom name="big_table_top" type="box" pos="0.0 0.4 0.72" size="1.55 0.6 0.08" material="table_top"
+          friction="0.3 0.005 0.0001"/>
+    <geom name="big_table_leg" type="box" pos="0.0 0.4 0.35" size="0.12 0.12 0.35" material="dark_metal"/>
+
+    <geom name="small_table_top" type="box" pos="1.8 -1.5 0.72" size="0.75 0.55 0.08" material="table_top"/>
+    <geom name="small_table_leg" type="box" pos="1.8 -1.5 0.35" size="0.10 0.10 0.35" material="dark_metal"/>
+
+    <!-- =========================
+         BACK BOOTHS
+         ========================= -->
+    <geom name="back_booth_1" type="box" pos="1.0 5.9 0.45" size="1.1 0.35 0.45" material="booth_red"/>
+    <geom name="back_table_1" type="box" pos="1.0 5.1 0.65" size="0.8 0.35 0.07" material="table_top"/>
+
+    <geom name="back_booth_2" type="box" pos="4.0 5.9 0.45" size="1.1 0.35 0.45" material="booth_red"/>
+    <geom name="back_table_2" type="box" pos="4.0 5.1 0.65" size="0.8 0.35 0.07" material="table_top"/>
+
+    <!-- =========================
+         RIGHT POOL / LOUNGE ZONE
+         ========================= -->
+    <geom name="pool_table_top"  type="box" pos="6.6 0.8 0.65" size="1.35 0.75 0.15" material="felt"/>
+    <geom name="pool_table_body" type="box" pos="6.6 0.8 0.48" size="1.50 0.90 0.08" material="bar_wood"/>
+
+    <geom name="pool_divider" type="box" pos="4.6 0.8 0.7" size="0.06 1.5 0.7" material="bar_wood"/>
+
+    <geom name="lounge_booth_1" type="box" pos="8.5 -1.7 0.45" size="0.95 0.35 0.45" material="booth_red"/>
+    <geom name="lounge_booth_2" type="box" pos="8.5  2.7 0.45" size="0.95 0.35 0.45" material="booth_red"/>
+
+    <!-- =========================
+         LARGE OPEN KITCHEN (BACK LEFT)
+         Wide access opening for robot maneuvering
+         ========================= -->
+
+    <!-- front divider walls with a wide opening in the middle -->
+    <geom name="kitchen_divider_left"  type="box" pos="-9.0 3.0 1.2" size="2.6 0.08 1.2" material="wall"/>
+    <geom name="kitchen_divider_right" type="box" pos="-1.2 3.0 1.2" size="2.0 0.08 1.2" material="wall"/>
+
+    <!-- posts at opening edges -->
+    <geom name="kitchen_post_left"  type="box" pos="-6.3 3.0 1.2" size="0.08 0.08 1.2" material="dark_metal"/>
+    <geom name="kitchen_post_right" type="box" pos="-3.2 3.0 1.2" size="0.08 0.08 1.2" material="dark_metal"/>
+
+    <!-- back counter line -->
+    <geom name="kitchen_counter_back" type="box" pos="-8.0 6.0 0.55" size="3.4 0.45 0.55" material="bar_wood"/>
+
+    <!-- side counter along left wall -->
+    <geom name="kitchen_counter_left" type="box" pos="-9.8 5.2 0.55" size="0.45 1.85 0.55" material="bar_wood"/>
+
+    <!-- simple stainless island / work block -->
+    <geom name="kitchen_island" type="box" pos="-8.2 4.3 0.55" size="0.8 0.5 0.55" material="light_gray"/>
+
+    <!-- BLUE TARGET / PREP TABLE -->
+    <geom name="blue_target_table_top" type="box" pos="-1.342 4.8 0.72" size="1.2 0.75 0.06" material="blue_target"/>
+    <geom name="blue_target_leg_1" type="box" pos="-2.292 4.20 0.36" size="0.04 0.04 0.36" material="dark_metal"/>
+    <geom name="blue_target_leg_2" type="box" pos="-0.392 4.20 0.36" size="0.04 0.04 0.36" material="dark_metal"/>
+    <geom name="blue_target_leg_3" type="box" pos="-2.292 5.40 0.36" size="0.04 0.04 0.36" material="dark_metal"/>
+    <geom name="blue_target_leg_4" type="box" pos="-0.392 5.40 0.36" size="0.04 0.04 0.36" material="dark_metal"/>
+
+    <!-- optional blue target block on top of the central table -->
+    <!-- Sizing/density/friction must match merged variants (g1_gear_wbc_stylish_diner.xml,
+         g1_gear_wbc_stylish_diner_hands.xml). -->
+    <body name="target_block" pos="-1.40 0.4 0.94">
+      <freejoint/>
+      <geom name="target_block_geom" type="box" size="0.14 0.14 0.14" material="blue_target"
+            density="5" friction="3.0 0.1 0.005"/>
+    </body>
+    <body name="plate" pos="-0.20 0.35 0.808">
+      <freejoint/>
+      <geom name="plate_base_geom" type="cylinder" size="0.11 0.008" material="ceramic_white"
+            density="350" friction="0.9 0.02 0.002"/>
+      <geom name="plate_rim_geom" type="cylinder" pos="0 0 0.004" size="0.125 0.004" material="ceramic_white"
+            density="350" friction="0.9 0.02 0.002"/>
+    </body>
+    <body name="cup" pos="0.35 0.47 0.851">
+      <freejoint/>
+      <geom name="cup_body_geom" type="cylinder" size="0.042 0.050" material="ceramic_white"
+            density="320" friction="0.9 0.02 0.002"/>
+      <geom name="cup_base_geom" type="cylinder" pos="0 0 -0.042" size="0.028 0.008" material="ceramic_white"
+            density="320" friction="0.9 0.02 0.002"/>
+      <geom name="cup_handle_geom" type="capsule" fromto="0.045 0 0.010 0.045 0 -0.030" size="0.007"
+            material="ceramic_white" density="320" friction="0.9 0.02 0.002"/>
+    </body>
+
+    <!-- open staging space is intentionally left clear around the blue table -->
+
+    <!-- =========================
+         LIGHTING
+         ========================= -->
+    <light name="light_1" pos="-5.0 0.0 3.8" dir="0 0 -1" diffuse="0.88 0.70 0.42" specular="0.03 0.025 0.02"/>
+    <light name="light_2" pos="0.0 0.5 3.8"  dir="0 0 -1" diffuse="0.88 0.70 0.42" specular="0.03 0.025 0.02"/>
+    <light name="light_3" pos="5.5 1.2 3.8"  dir="0 0 -1" diffuse="0.88 0.70 0.42" specular="0.03 0.025 0.02"/>
+    <light name="light_4" pos="-6.0 5.0 3.8" dir="0 0 -1" diffuse="0.82 0.82 0.90" specular="0.04 0.04 0.05"/>
+  </worldbody>
+</mujoco>

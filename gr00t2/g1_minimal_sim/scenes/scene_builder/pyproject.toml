@@ -1,0 +1,10 @@
+[project]
+name = "scene-builder"
+version = "0.1.0"
+description = "GLB/USD → MuJoCo asset export for GR00T2 / G1 scenes"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

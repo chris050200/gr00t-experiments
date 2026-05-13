@@ -1,0 +1,82 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build Windows (Experimental)
+
+# WARNING: This workflow is for experimental Windows builds only!
+# Windows support is NOT officially supported - this only tests source compilation.
+# There is NO guarantee of runtime functionality on Windows.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+# Per workflow+ref: max 1 running + 1 pending (new pending replaces old).
+# PRs cancel in-progress runs; pushes to main do not.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install uv
+      uses: ./.github/actions/setup-uv
+
+    - name: Setup sccache
+      uses: Mozilla-Actions/sccache-action@7d986dd989559c6ecdb630a3fd2557667be217ad  # v0.0.9
+
+    # Hunter cache - caches depthai dependencies
+    # Note: Hunter uses C:/.hunter on Windows (at drive root)
+    - name: Cache Hunter packages
+      uses: actions/cache@v5
+      with:
+        path: C:/.hunter
+        key: hunter-${{ runner.os }}-${{ hashFiles('cmake/SetupHunter.cmake') }}
+        restore-keys: |
+          hunter-${{ runner.os }}-
+
+    - name: Verify sccache
+      run: |
+        sccache --version
+
+    # Put cl.exe and other build tools in PATH
+    - name: Setup MSVC (Developer Command Prompt)
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Configure CMake
+      # Note:
+      # sccache does not work with VSBuild, so we use Ninja generator here.
+      # -G Ninja would pickup mingw64 by default on Windows, so we explicitly set the compiler to cl.exe
+      # Force embedded debug info (Z7) to avoid PDB contention whenever debug info is generated.
+      run: >
+        cmake -B build -G Ninja
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DENABLE_EXPERIMENTAL_WINDOWS_BUILD=ON
+        -DCMAKE_C_COMPILER_LAUNCHER=sccache
+        -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+        -DCMAKE_C_COMPILER="cl.exe"
+        -DCMAKE_CXX_COMPILER="cl.exe"
+        -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded
+        -DBUILD_PLUGIN_OAK_CAMERA=ON
+
+    - name: Build
+      run: cmake --build build --parallel
+
+    - name: Run All Tests
+      run: ctest --test-dir build --output-on-failure --parallel

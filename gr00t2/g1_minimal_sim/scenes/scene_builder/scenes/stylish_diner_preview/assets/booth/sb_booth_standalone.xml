@@ -1,0 +1,41 @@
+<mujoco model="sb_booth_library">
+  <compiler angle="radian" meshdir="meshes" texturedir="textures"/>
+  <asset>
+    <mesh name="sb_booth_mesh00" file="sb_booth_m00.obj"/>
+    <texture name="sb_booth_tex00" type="2d" file="sb_booth_t00.png"/>
+    <material name="sb_booth_mat00" texture="sb_booth_tex00" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh01" file="sb_booth_m01.obj"/>
+    <texture name="sb_booth_tex01" type="2d" file="sb_booth_t01.png"/>
+    <material name="sb_booth_mat01" texture="sb_booth_tex01" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh02" file="sb_booth_m02.obj"/>
+    <texture name="sb_booth_tex02" type="2d" file="sb_booth_t02.png"/>
+    <material name="sb_booth_mat02" texture="sb_booth_tex02" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh03" file="sb_booth_m03.obj"/>
+    <texture name="sb_booth_tex03" type="2d" file="sb_booth_t03.png"/>
+    <material name="sb_booth_mat03" texture="sb_booth_tex03" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh04" file="sb_booth_m04.obj"/>
+    <texture name="sb_booth_tex04" type="2d" file="sb_booth_t04.png"/>
+    <material name="sb_booth_mat04" texture="sb_booth_tex04" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh05" file="sb_booth_m05.obj"/>
+    <texture name="sb_booth_tex05" type="2d" file="sb_booth_t05.png"/>
+    <material name="sb_booth_mat05" texture="sb_booth_tex05" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh06" file="sb_booth_m06.obj"/>
+    <texture name="sb_booth_tex06" type="2d" file="sb_booth_t06.png"/>
+    <material name="sb_booth_mat06" texture="sb_booth_tex06" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh07" file="sb_booth_m07.obj"/>
+    <texture name="sb_booth_tex07" type="2d" file="sb_booth_t07.png"/>
+    <material name="sb_booth_mat07" texture="sb_booth_tex07" reflectance="0.5" specular="0.5" shininess="0.5"/>
+  </asset>
+  <worldbody>
+    <body name="sb_booth_root" pos="0.0 0.0 0.0">
+      <geom name="sb_booth_g00" type="mesh" mesh="sb_booth_mesh00" material="sb_booth_mat00" contype="0" conaffinity="0"/>
+      <geom name="sb_booth_g01" type="mesh" mesh="sb_booth_mesh01" material="sb_booth_mat01" contype="0" conaffinity="0"/>
+      <geom name="sb_booth_g02" type="mesh" mesh="sb_booth_mesh02" material="sb_booth_mat02" contype="0" conaffinity="0"/>
+      <geom name="sb_booth_g03" type="mesh" mesh="sb_booth_mesh03" material="sb_booth_mat03" contype="0" conaffinity="0"/>
+      <geom name="sb_booth_g04" type="mesh" mesh="sb_booth_mesh04" material="sb_booth_mat04" contype="0" conaffinity="0"/>
+      <geom name="sb_booth_g05" type="mesh" mesh="sb_booth_mesh05" material="sb_booth_mat05" contype="0" conaffinity="0"/>
+      <geom name="sb_booth_g06" type="mesh" mesh="sb_booth_mesh06" material="sb_booth_mat06" contype="0" conaffinity="0"/>
+      <geom name="sb_booth_g07" type="mesh" mesh="sb_booth_mesh07" material="sb_booth_mat07" contype="0" conaffinity="0"/>
+    </body>
+  </worldbody>
+</mujoco>

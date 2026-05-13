@@ -1,0 +1,39 @@
+# Upstream Isaac-GR00T is its own git checkout (nested .git). Do not vendor it here.
+Isaac-GR00T/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# MuJoCo / pytest noise
+MUJOCO_LOG.TXT
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+*.swp
+*~
+
+# Large ML artifacts (pull via LFS in dependency repos if needed)
+*.onnx
+*.pt
+*.pth
+*.ckpt
+
+# Local sim / recordings / dumps (large; keep out of git)
+g1_minimal_sim/data/

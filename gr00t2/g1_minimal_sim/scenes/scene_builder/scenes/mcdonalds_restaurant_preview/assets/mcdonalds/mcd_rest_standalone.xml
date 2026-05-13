@@ -1,0 +1,413 @@
+<mujoco model="mcd_rest_library">
+  <compiler angle="radian" meshdir="meshes" texturedir="textures"/>
+  <asset>
+    <mesh name="mcd_rest_mesh00" file="mcd_rest_m00.stl"/>
+    <mesh name="mcd_rest_mesh01" file="mcd_rest_m01.stl"/>
+    <mesh name="mcd_rest_mesh02" file="mcd_rest_m02.obj"/>
+    <texture name="mcd_rest_tex02" type="2d" file="mcd_rest_t02.png"/>
+    <material name="mcd_rest_mat02" texture="mcd_rest_tex02" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh03" file="mcd_rest_m03.obj"/>
+    <texture name="mcd_rest_tex03" type="2d" file="mcd_rest_t03.png"/>
+    <material name="mcd_rest_mat03" texture="mcd_rest_tex03" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh04" file="mcd_rest_m04.obj"/>
+    <texture name="mcd_rest_tex04" type="2d" file="mcd_rest_t04.png"/>
+    <material name="mcd_rest_mat04" texture="mcd_rest_tex04" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh05" file="mcd_rest_m05.obj"/>
+    <texture name="mcd_rest_tex05" type="2d" file="mcd_rest_t05.png"/>
+    <material name="mcd_rest_mat05" texture="mcd_rest_tex05" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh06" file="mcd_rest_m06.obj"/>
+    <texture name="mcd_rest_tex06" type="2d" file="mcd_rest_t06.png"/>
+    <material name="mcd_rest_mat06" texture="mcd_rest_tex06" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh07" file="mcd_rest_m07.obj"/>
+    <texture name="mcd_rest_tex07" type="2d" file="mcd_rest_t07.png"/>
+    <material name="mcd_rest_mat07" texture="mcd_rest_tex07" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh08" file="mcd_rest_m08.obj"/>
+    <texture name="mcd_rest_tex08" type="2d" file="mcd_rest_t08.png"/>
+    <material name="mcd_rest_mat08" texture="mcd_rest_tex08" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh09" file="mcd_rest_m09.obj"/>
+    <texture name="mcd_rest_tex09" type="2d" file="mcd_rest_t09.png"/>
+    <material name="mcd_rest_mat09" texture="mcd_rest_tex09" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh10" file="mcd_rest_m10.obj"/>
+    <texture name="mcd_rest_tex10" type="2d" file="mcd_rest_t10.png"/>
+    <material name="mcd_rest_mat10" texture="mcd_rest_tex10" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh11" file="mcd_rest_m11.obj"/>
+    <texture name="mcd_rest_tex11" type="2d" file="mcd_rest_t11.png"/>
+    <material name="mcd_rest_mat11" texture="mcd_rest_tex11" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh12" file="mcd_rest_m12.obj"/>
+    <texture name="mcd_rest_tex12" type="2d" file="mcd_rest_t12.png"/>
+    <material name="mcd_rest_mat12" texture="mcd_rest_tex12" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh13" file="mcd_rest_m13.obj"/>
+    <texture name="mcd_rest_tex13" type="2d" file="mcd_rest_t13.png"/>
+    <material name="mcd_rest_mat13" texture="mcd_rest_tex13" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh14" file="mcd_rest_m14.obj"/>
+    <texture name="mcd_rest_tex14" type="2d" file="mcd_rest_t14.png"/>
+    <material name="mcd_rest_mat14" texture="mcd_rest_tex14" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh15" file="mcd_rest_m15.obj"/>
+    <texture name="mcd_rest_tex15" type="2d" file="mcd_rest_t15.png"/>
+    <material name="mcd_rest_mat15" texture="mcd_rest_tex15" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh16" file="mcd_rest_m16.obj"/>
+    <texture name="mcd_rest_tex16" type="2d" file="mcd_rest_t16.png"/>
+    <material name="mcd_rest_mat16" texture="mcd_rest_tex16" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh17" file="mcd_rest_m17.obj"/>
+    <texture name="mcd_rest_tex17" type="2d" file="mcd_rest_t17.png"/>
+    <material name="mcd_rest_mat17" texture="mcd_rest_tex17" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh18" file="mcd_rest_m18.obj"/>
+    <texture name="mcd_rest_tex18" type="2d" file="mcd_rest_t18.png"/>
+    <material name="mcd_rest_mat18" texture="mcd_rest_tex18" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh19" file="mcd_rest_m19.obj"/>
+    <texture name="mcd_rest_tex19" type="2d" file="mcd_rest_t19.png"/>
+    <material name="mcd_rest_mat19" texture="mcd_rest_tex19" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh20" file="mcd_rest_m20.obj"/>
+    <texture name="mcd_rest_tex20" type="2d" file="mcd_rest_t20.png"/>
+    <material name="mcd_rest_mat20" texture="mcd_rest_tex20" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh21" file="mcd_rest_m21.obj"/>
+    <texture name="mcd_rest_tex21" type="2d" file="mcd_rest_t21.png"/>
+    <material name="mcd_rest_mat21" texture="mcd_rest_tex21" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh22" file="mcd_rest_m22.obj"/>
+    <texture name="mcd_rest_tex22" type="2d" file="mcd_rest_t22.png"/>
+    <material name="mcd_rest_mat22" texture="mcd_rest_tex22" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh23" file="mcd_rest_m23.obj"/>
+    <texture name="mcd_rest_tex23" type="2d" file="mcd_rest_t23.png"/>
+    <material name="mcd_rest_mat23" texture="mcd_rest_tex23" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh24" file="mcd_rest_m24.obj"/>
+    <texture name="mcd_rest_tex24" type="2d" file="mcd_rest_t24.png"/>
+    <material name="mcd_rest_mat24" texture="mcd_rest_tex24" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh25" file="mcd_rest_m25.obj"/>
+    <texture name="mcd_rest_tex25" type="2d" file="mcd_rest_t25.png"/>
+    <material name="mcd_rest_mat25" texture="mcd_rest_tex25" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh26" file="mcd_rest_m26.obj"/>
+    <texture name="mcd_rest_tex26" type="2d" file="mcd_rest_t26.png"/>
+    <material name="mcd_rest_mat26" texture="mcd_rest_tex26" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh27" file="mcd_rest_m27.obj"/>
+    <texture name="mcd_rest_tex27" type="2d" file="mcd_rest_t27.png"/>
+    <material name="mcd_rest_mat27" texture="mcd_rest_tex27" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh28" file="mcd_rest_m28.obj"/>
+    <texture name="mcd_rest_tex28" type="2d" file="mcd_rest_t28.png"/>
+    <material name="mcd_rest_mat28" texture="mcd_rest_tex28" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh29" file="mcd_rest_m29.obj"/>
+    <texture name="mcd_rest_tex29" type="2d" file="mcd_rest_t29.png"/>
+    <material name="mcd_rest_mat29" texture="mcd_rest_tex29" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh30" file="mcd_rest_m30.obj"/>
+    <texture name="mcd_rest_tex30" type="2d" file="mcd_rest_t30.png"/>
+    <material name="mcd_rest_mat30" texture="mcd_rest_tex30" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh31" file="mcd_rest_m31.obj"/>
+    <texture name="mcd_rest_tex31" type="2d" file="mcd_rest_t31.png"/>
+    <material name="mcd_rest_mat31" texture="mcd_rest_tex31" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh32" file="mcd_rest_m32.obj"/>
+    <texture name="mcd_rest_tex32" type="2d" file="mcd_rest_t32.png"/>
+    <material name="mcd_rest_mat32" texture="mcd_rest_tex32" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh33" file="mcd_rest_m33.obj"/>
+    <texture name="mcd_rest_tex33" type="2d" file="mcd_rest_t33.png"/>
+    <material name="mcd_rest_mat33" texture="mcd_rest_tex33" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh34" file="mcd_rest_m34.obj"/>
+    <texture name="mcd_rest_tex34" type="2d" file="mcd_rest_t34.png"/>
+    <material name="mcd_rest_mat34" texture="mcd_rest_tex34" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh35" file="mcd_rest_m35.obj"/>
+    <texture name="mcd_rest_tex35" type="2d" file="mcd_rest_t35.png"/>
+    <material name="mcd_rest_mat35" texture="mcd_rest_tex35" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh36" file="mcd_rest_m36.obj"/>
+    <texture name="mcd_rest_tex36" type="2d" file="mcd_rest_t36.png"/>
+    <material name="mcd_rest_mat36" texture="mcd_rest_tex36" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh37" file="mcd_rest_m37.obj"/>
+    <texture name="mcd_rest_tex37" type="2d" file="mcd_rest_t37.png"/>
+    <material name="mcd_rest_mat37" texture="mcd_rest_tex37" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh38" file="mcd_rest_m38.obj"/>
+    <texture name="mcd_rest_tex38" type="2d" file="mcd_rest_t38.png"/>
+    <material name="mcd_rest_mat38" texture="mcd_rest_tex38" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh39" file="mcd_rest_m39.obj"/>
+    <texture name="mcd_rest_tex39" type="2d" file="mcd_rest_t39.png"/>
+    <material name="mcd_rest_mat39" texture="mcd_rest_tex39" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh40" file="mcd_rest_m40.obj"/>
+    <texture name="mcd_rest_tex40" type="2d" file="mcd_rest_t40.png"/>
+    <material name="mcd_rest_mat40" texture="mcd_rest_tex40" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh41" file="mcd_rest_m41.obj"/>
+    <texture name="mcd_rest_tex41" type="2d" file="mcd_rest_t41.png"/>
+    <material name="mcd_rest_mat41" texture="mcd_rest_tex41" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh42" file="mcd_rest_m42.obj"/>
+    <texture name="mcd_rest_tex42" type="2d" file="mcd_rest_t42.png"/>
+    <material name="mcd_rest_mat42" texture="mcd_rest_tex42" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh43" file="mcd_rest_m43.obj"/>
+    <texture name="mcd_rest_tex43" type="2d" file="mcd_rest_t43.png"/>
+    <material name="mcd_rest_mat43" texture="mcd_rest_tex43" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh44" file="mcd_rest_m44.obj"/>
+    <texture name="mcd_rest_tex44" type="2d" file="mcd_rest_t44.png"/>
+    <material name="mcd_rest_mat44" texture="mcd_rest_tex44" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh45" file="mcd_rest_m45.obj"/>
+    <texture name="mcd_rest_tex45" type="2d" file="mcd_rest_t45.png"/>
+    <material name="mcd_rest_mat45" texture="mcd_rest_tex45" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh46" file="mcd_rest_m46.obj"/>
+    <texture name="mcd_rest_tex46" type="2d" file="mcd_rest_t46.png"/>
+    <material name="mcd_rest_mat46" texture="mcd_rest_tex46" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh47" file="mcd_rest_m47.obj"/>
+    <texture name="mcd_rest_tex47" type="2d" file="mcd_rest_t47.png"/>
+    <material name="mcd_rest_mat47" texture="mcd_rest_tex47" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh48" file="mcd_rest_m48.obj"/>
+    <texture name="mcd_rest_tex48" type="2d" file="mcd_rest_t48.png"/>
+    <material name="mcd_rest_mat48" texture="mcd_rest_tex48" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh49" file="mcd_rest_m49.obj"/>
+    <texture name="mcd_rest_tex49" type="2d" file="mcd_rest_t49.png"/>
+    <material name="mcd_rest_mat49" texture="mcd_rest_tex49" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh50" file="mcd_rest_m50.obj"/>
+    <texture name="mcd_rest_tex50" type="2d" file="mcd_rest_t50.png"/>
+    <material name="mcd_rest_mat50" texture="mcd_rest_tex50" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh51" file="mcd_rest_m51.obj"/>
+    <texture name="mcd_rest_tex51" type="2d" file="mcd_rest_t51.png"/>
+    <material name="mcd_rest_mat51" texture="mcd_rest_tex51" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh52" file="mcd_rest_m52.obj"/>
+    <texture name="mcd_rest_tex52" type="2d" file="mcd_rest_t52.png"/>
+    <material name="mcd_rest_mat52" texture="mcd_rest_tex52" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh53" file="mcd_rest_m53.obj"/>
+    <texture name="mcd_rest_tex53" type="2d" file="mcd_rest_t53.png"/>
+    <material name="mcd_rest_mat53" texture="mcd_rest_tex53" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh54" file="mcd_rest_m54.obj"/>
+    <texture name="mcd_rest_tex54" type="2d" file="mcd_rest_t54.png"/>
+    <material name="mcd_rest_mat54" texture="mcd_rest_tex54" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh55" file="mcd_rest_m55.obj"/>
+    <texture name="mcd_rest_tex55" type="2d" file="mcd_rest_t55.png"/>
+    <material name="mcd_rest_mat55" texture="mcd_rest_tex55" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh56" file="mcd_rest_m56.obj"/>
+    <texture name="mcd_rest_tex56" type="2d" file="mcd_rest_t56.png"/>
+    <material name="mcd_rest_mat56" texture="mcd_rest_tex56" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh57" file="mcd_rest_m57.obj"/>
+    <texture name="mcd_rest_tex57" type="2d" file="mcd_rest_t57.png"/>
+    <material name="mcd_rest_mat57" texture="mcd_rest_tex57" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh58" file="mcd_rest_m58.obj"/>
+    <texture name="mcd_rest_tex58" type="2d" file="mcd_rest_t58.png"/>
+    <material name="mcd_rest_mat58" texture="mcd_rest_tex58" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh59" file="mcd_rest_m59.obj"/>
+    <texture name="mcd_rest_tex59" type="2d" file="mcd_rest_t59.png"/>
+    <material name="mcd_rest_mat59" texture="mcd_rest_tex59" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh60" file="mcd_rest_m60.obj"/>
+    <texture name="mcd_rest_tex60" type="2d" file="mcd_rest_t60.png"/>
+    <material name="mcd_rest_mat60" texture="mcd_rest_tex60" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh61" file="mcd_rest_m61.obj"/>
+    <texture name="mcd_rest_tex61" type="2d" file="mcd_rest_t61.png"/>
+    <material name="mcd_rest_mat61" texture="mcd_rest_tex61" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh62" file="mcd_rest_m62.obj"/>
+    <texture name="mcd_rest_tex62" type="2d" file="mcd_rest_t62.png"/>
+    <material name="mcd_rest_mat62" texture="mcd_rest_tex62" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh63" file="mcd_rest_m63.obj"/>
+    <texture name="mcd_rest_tex63" type="2d" file="mcd_rest_t63.png"/>
+    <material name="mcd_rest_mat63" texture="mcd_rest_tex63" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh64" file="mcd_rest_m64.obj"/>
+    <texture name="mcd_rest_tex64" type="2d" file="mcd_rest_t64.png"/>
+    <material name="mcd_rest_mat64" texture="mcd_rest_tex64" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh65" file="mcd_rest_m65.obj"/>
+    <texture name="mcd_rest_tex65" type="2d" file="mcd_rest_t65.png"/>
+    <material name="mcd_rest_mat65" texture="mcd_rest_tex65" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh66" file="mcd_rest_m66.obj"/>
+    <texture name="mcd_rest_tex66" type="2d" file="mcd_rest_t66.png"/>
+    <material name="mcd_rest_mat66" texture="mcd_rest_tex66" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh67" file="mcd_rest_m67.obj"/>
+    <texture name="mcd_rest_tex67" type="2d" file="mcd_rest_t67.png"/>
+    <material name="mcd_rest_mat67" texture="mcd_rest_tex67" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh68" file="mcd_rest_m68.obj"/>
+    <texture name="mcd_rest_tex68" type="2d" file="mcd_rest_t68.png"/>
+    <material name="mcd_rest_mat68" texture="mcd_rest_tex68" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh69" file="mcd_rest_m69.obj"/>
+    <texture name="mcd_rest_tex69" type="2d" file="mcd_rest_t69.png"/>
+    <material name="mcd_rest_mat69" texture="mcd_rest_tex69" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh70" file="mcd_rest_m70.obj"/>
+    <texture name="mcd_rest_tex70" type="2d" file="mcd_rest_t70.png"/>
+    <material name="mcd_rest_mat70" texture="mcd_rest_tex70" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh71" file="mcd_rest_m71.obj"/>
+    <texture name="mcd_rest_tex71" type="2d" file="mcd_rest_t71.png"/>
+    <material name="mcd_rest_mat71" texture="mcd_rest_tex71" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh72" file="mcd_rest_m72.obj"/>
+    <texture name="mcd_rest_tex72" type="2d" file="mcd_rest_t72.png"/>
+    <material name="mcd_rest_mat72" texture="mcd_rest_tex72" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh73" file="mcd_rest_m73.obj"/>
+    <texture name="mcd_rest_tex73" type="2d" file="mcd_rest_t73.png"/>
+    <material name="mcd_rest_mat73" texture="mcd_rest_tex73" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh74" file="mcd_rest_m74.obj"/>
+    <texture name="mcd_rest_tex74" type="2d" file="mcd_rest_t74.png"/>
+    <material name="mcd_rest_mat74" texture="mcd_rest_tex74" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh75" file="mcd_rest_m75.obj"/>
+    <texture name="mcd_rest_tex75" type="2d" file="mcd_rest_t75.png"/>
+    <material name="mcd_rest_mat75" texture="mcd_rest_tex75" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh76" file="mcd_rest_m76.obj"/>
+    <texture name="mcd_rest_tex76" type="2d" file="mcd_rest_t76.png"/>
+    <material name="mcd_rest_mat76" texture="mcd_rest_tex76" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh77" file="mcd_rest_m77.obj"/>
+    <texture name="mcd_rest_tex77" type="2d" file="mcd_rest_t77.png"/>
+    <material name="mcd_rest_mat77" texture="mcd_rest_tex77" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh78" file="mcd_rest_m78.obj"/>
+    <texture name="mcd_rest_tex78" type="2d" file="mcd_rest_t78.png"/>
+    <material name="mcd_rest_mat78" texture="mcd_rest_tex78" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh79" file="mcd_rest_m79.obj"/>
+    <texture name="mcd_rest_tex79" type="2d" file="mcd_rest_t79.png"/>
+    <material name="mcd_rest_mat79" texture="mcd_rest_tex79" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh80" file="mcd_rest_m80.obj"/>
+    <texture name="mcd_rest_tex80" type="2d" file="mcd_rest_t80.png"/>
+    <material name="mcd_rest_mat80" texture="mcd_rest_tex80" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh81" file="mcd_rest_m81.obj"/>
+    <texture name="mcd_rest_tex81" type="2d" file="mcd_rest_t81.png"/>
+    <material name="mcd_rest_mat81" texture="mcd_rest_tex81" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh82" file="mcd_rest_m82.obj"/>
+    <texture name="mcd_rest_tex82" type="2d" file="mcd_rest_t82.png"/>
+    <material name="mcd_rest_mat82" texture="mcd_rest_tex82" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh83" file="mcd_rest_m83.obj"/>
+    <texture name="mcd_rest_tex83" type="2d" file="mcd_rest_t83.png"/>
+    <material name="mcd_rest_mat83" texture="mcd_rest_tex83" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh84" file="mcd_rest_m84.obj"/>
+    <texture name="mcd_rest_tex84" type="2d" file="mcd_rest_t84.png"/>
+    <material name="mcd_rest_mat84" texture="mcd_rest_tex84" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh85" file="mcd_rest_m85.obj"/>
+    <texture name="mcd_rest_tex85" type="2d" file="mcd_rest_t85.png"/>
+    <material name="mcd_rest_mat85" texture="mcd_rest_tex85" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh86" file="mcd_rest_m86.obj"/>
+    <texture name="mcd_rest_tex86" type="2d" file="mcd_rest_t86.png"/>
+    <material name="mcd_rest_mat86" texture="mcd_rest_tex86" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh87" file="mcd_rest_m87.obj"/>
+    <texture name="mcd_rest_tex87" type="2d" file="mcd_rest_t87.png"/>
+    <material name="mcd_rest_mat87" texture="mcd_rest_tex87" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh88" file="mcd_rest_m88.obj"/>
+    <texture name="mcd_rest_tex88" type="2d" file="mcd_rest_t88.png"/>
+    <material name="mcd_rest_mat88" texture="mcd_rest_tex88" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh89" file="mcd_rest_m89.obj"/>
+    <texture name="mcd_rest_tex89" type="2d" file="mcd_rest_t89.png"/>
+    <material name="mcd_rest_mat89" texture="mcd_rest_tex89" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh90" file="mcd_rest_m90.obj"/>
+    <texture name="mcd_rest_tex90" type="2d" file="mcd_rest_t90.png"/>
+    <material name="mcd_rest_mat90" texture="mcd_rest_tex90" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh91" file="mcd_rest_m91.obj"/>
+    <texture name="mcd_rest_tex91" type="2d" file="mcd_rest_t91.png"/>
+    <material name="mcd_rest_mat91" texture="mcd_rest_tex91" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh92" file="mcd_rest_m92.obj"/>
+    <texture name="mcd_rest_tex92" type="2d" file="mcd_rest_t92.png"/>
+    <material name="mcd_rest_mat92" texture="mcd_rest_tex92" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh93" file="mcd_rest_m93.obj"/>
+    <texture name="mcd_rest_tex93" type="2d" file="mcd_rest_t93.png"/>
+    <material name="mcd_rest_mat93" texture="mcd_rest_tex93" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh94" file="mcd_rest_m94.obj"/>
+    <texture name="mcd_rest_tex94" type="2d" file="mcd_rest_t94.png"/>
+    <material name="mcd_rest_mat94" texture="mcd_rest_tex94" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh95" file="mcd_rest_m95.obj"/>
+    <texture name="mcd_rest_tex95" type="2d" file="mcd_rest_t95.png"/>
+    <material name="mcd_rest_mat95" texture="mcd_rest_tex95" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh96" file="mcd_rest_m96.obj"/>
+    <texture name="mcd_rest_tex96" type="2d" file="mcd_rest_t96.png"/>
+    <material name="mcd_rest_mat96" texture="mcd_rest_tex96" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh97" file="mcd_rest_m97.obj"/>
+    <texture name="mcd_rest_tex97" type="2d" file="mcd_rest_t97.png"/>
+    <material name="mcd_rest_mat97" texture="mcd_rest_tex97" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh98" file="mcd_rest_m98.obj"/>
+    <texture name="mcd_rest_tex98" type="2d" file="mcd_rest_t98.png"/>
+    <material name="mcd_rest_mat98" texture="mcd_rest_tex98" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh99" file="mcd_rest_m99.obj"/>
+    <texture name="mcd_rest_tex99" type="2d" file="mcd_rest_t99.png"/>
+    <material name="mcd_rest_mat99" texture="mcd_rest_tex99" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh100" file="mcd_rest_m100.obj"/>
+    <texture name="mcd_rest_tex100" type="2d" file="mcd_rest_t100.png"/>
+    <material name="mcd_rest_mat100" texture="mcd_rest_tex100" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="mcd_rest_mesh101" file="mcd_rest_m101.obj"/>
+    <texture name="mcd_rest_tex101" type="2d" file="mcd_rest_t101.png"/>
+    <material name="mcd_rest_mat101" texture="mcd_rest_tex101" reflectance="0.5" specular="0.5" shininess="0.5"/>
+  </asset>
+  <worldbody>
+    <body name="mcd_rest_root" pos="0.0 0.0 0.0">
+      <geom name="mcd_rest_g00" type="mesh" mesh="mcd_rest_mesh00" rgba="1 1 1 0" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g01" type="mesh" mesh="mcd_rest_mesh01" rgba="1 1 1 0" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g02" type="mesh" mesh="mcd_rest_mesh02" material="mcd_rest_mat02" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g03" type="mesh" mesh="mcd_rest_mesh03" material="mcd_rest_mat03" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g04" type="mesh" mesh="mcd_rest_mesh04" material="mcd_rest_mat04" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g05" type="mesh" mesh="mcd_rest_mesh05" material="mcd_rest_mat05" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g06" type="mesh" mesh="mcd_rest_mesh06" material="mcd_rest_mat06" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g07" type="mesh" mesh="mcd_rest_mesh07" material="mcd_rest_mat07" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g08" type="mesh" mesh="mcd_rest_mesh08" material="mcd_rest_mat08" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g09" type="mesh" mesh="mcd_rest_mesh09" material="mcd_rest_mat09" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g10" type="mesh" mesh="mcd_rest_mesh10" material="mcd_rest_mat10" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g11" type="mesh" mesh="mcd_rest_mesh11" material="mcd_rest_mat11" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g12" type="mesh" mesh="mcd_rest_mesh12" material="mcd_rest_mat12" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g13" type="mesh" mesh="mcd_rest_mesh13" material="mcd_rest_mat13" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g14" type="mesh" mesh="mcd_rest_mesh14" material="mcd_rest_mat14" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g15" type="mesh" mesh="mcd_rest_mesh15" material="mcd_rest_mat15" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g16" type="mesh" mesh="mcd_rest_mesh16" material="mcd_rest_mat16" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g17" type="mesh" mesh="mcd_rest_mesh17" material="mcd_rest_mat17" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g18" type="mesh" mesh="mcd_rest_mesh18" material="mcd_rest_mat18" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g19" type="mesh" mesh="mcd_rest_mesh19" material="mcd_rest_mat19" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g20" type="mesh" mesh="mcd_rest_mesh20" material="mcd_rest_mat20" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g21" type="mesh" mesh="mcd_rest_mesh21" material="mcd_rest_mat21" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g22" type="mesh" mesh="mcd_rest_mesh22" material="mcd_rest_mat22" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g23" type="mesh" mesh="mcd_rest_mesh23" material="mcd_rest_mat23" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g24" type="mesh" mesh="mcd_rest_mesh24" material="mcd_rest_mat24" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g25" type="mesh" mesh="mcd_rest_mesh25" material="mcd_rest_mat25" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g26" type="mesh" mesh="mcd_rest_mesh26" material="mcd_rest_mat26" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g27" type="mesh" mesh="mcd_rest_mesh27" material="mcd_rest_mat27" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g28" type="mesh" mesh="mcd_rest_mesh28" material="mcd_rest_mat28" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g29" type="mesh" mesh="mcd_rest_mesh29" material="mcd_rest_mat29" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g30" type="mesh" mesh="mcd_rest_mesh30" material="mcd_rest_mat30" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g31" type="mesh" mesh="mcd_rest_mesh31" material="mcd_rest_mat31" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g32" type="mesh" mesh="mcd_rest_mesh32" material="mcd_rest_mat32" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g33" type="mesh" mesh="mcd_rest_mesh33" material="mcd_rest_mat33" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g34" type="mesh" mesh="mcd_rest_mesh34" material="mcd_rest_mat34" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g35" type="mesh" mesh="mcd_rest_mesh35" material="mcd_rest_mat35" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g36" type="mesh" mesh="mcd_rest_mesh36" material="mcd_rest_mat36" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g37" type="mesh" mesh="mcd_rest_mesh37" material="mcd_rest_mat37" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g38" type="mesh" mesh="mcd_rest_mesh38" material="mcd_rest_mat38" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g39" type="mesh" mesh="mcd_rest_mesh39" material="mcd_rest_mat39" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g40" type="mesh" mesh="mcd_rest_mesh40" material="mcd_rest_mat40" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g41" type="mesh" mesh="mcd_rest_mesh41" material="mcd_rest_mat41" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g42" type="mesh" mesh="mcd_rest_mesh42" material="mcd_rest_mat42" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g43" type="mesh" mesh="mcd_rest_mesh43" material="mcd_rest_mat43" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g44" type="mesh" mesh="mcd_rest_mesh44" material="mcd_rest_mat44" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g45" type="mesh" mesh="mcd_rest_mesh45" material="mcd_rest_mat45" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g46" type="mesh" mesh="mcd_rest_mesh46" material="mcd_rest_mat46" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g47" type="mesh" mesh="mcd_rest_mesh47" material="mcd_rest_mat47" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g48" type="mesh" mesh="mcd_rest_mesh48" material="mcd_rest_mat48" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g49" type="mesh" mesh="mcd_rest_mesh49" material="mcd_rest_mat49" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g50" type="mesh" mesh="mcd_rest_mesh50" material="mcd_rest_mat50" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g51" type="mesh" mesh="mcd_rest_mesh51" material="mcd_rest_mat51" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g52" type="mesh" mesh="mcd_rest_mesh52" material="mcd_rest_mat52" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g53" type="mesh" mesh="mcd_rest_mesh53" material="mcd_rest_mat53" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g54" type="mesh" mesh="mcd_rest_mesh54" material="mcd_rest_mat54" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g55" type="mesh" mesh="mcd_rest_mesh55" material="mcd_rest_mat55" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g56" type="mesh" mesh="mcd_rest_mesh56" material="mcd_rest_mat56" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g57" type="mesh" mesh="mcd_rest_mesh57" material="mcd_rest_mat57" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g58" type="mesh" mesh="mcd_rest_mesh58" material="mcd_rest_mat58" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g59" type="mesh" mesh="mcd_rest_mesh59" material="mcd_rest_mat59" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g60" type="mesh" mesh="mcd_rest_mesh60" material="mcd_rest_mat60" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g61" type="mesh" mesh="mcd_rest_mesh61" material="mcd_rest_mat61" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g62" type="mesh" mesh="mcd_rest_mesh62" material="mcd_rest_mat62" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g63" type="mesh" mesh="mcd_rest_mesh63" material="mcd_rest_mat63" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g64" type="mesh" mesh="mcd_rest_mesh64" material="mcd_rest_mat64" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g65" type="mesh" mesh="mcd_rest_mesh65" material="mcd_rest_mat65" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g66" type="mesh" mesh="mcd_rest_mesh66" material="mcd_rest_mat66" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g67" type="mesh" mesh="mcd_rest_mesh67" material="mcd_rest_mat67" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g68" type="mesh" mesh="mcd_rest_mesh68" material="mcd_rest_mat68" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g69" type="mesh" mesh="mcd_rest_mesh69" material="mcd_rest_mat69" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g70" type="mesh" mesh="mcd_rest_mesh70" material="mcd_rest_mat70" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g71" type="mesh" mesh="mcd_rest_mesh71" material="mcd_rest_mat71" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g72" type="mesh" mesh="mcd_rest_mesh72" material="mcd_rest_mat72" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g73" type="mesh" mesh="mcd_rest_mesh73" material="mcd_rest_mat73" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g74" type="mesh" mesh="mcd_rest_mesh74" material="mcd_rest_mat74" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g75" type="mesh" mesh="mcd_rest_mesh75" material="mcd_rest_mat75" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g76" type="mesh" mesh="mcd_rest_mesh76" material="mcd_rest_mat76" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g77" type="mesh" mesh="mcd_rest_mesh77" material="mcd_rest_mat77" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g78" type="mesh" mesh="mcd_rest_mesh78" material="mcd_rest_mat78" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g79" type="mesh" mesh="mcd_rest_mesh79" material="mcd_rest_mat79" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g80" type="mesh" mesh="mcd_rest_mesh80" material="mcd_rest_mat80" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g81" type="mesh" mesh="mcd_rest_mesh81" material="mcd_rest_mat81" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g82" type="mesh" mesh="mcd_rest_mesh82" material="mcd_rest_mat82" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g83" type="mesh" mesh="mcd_rest_mesh83" material="mcd_rest_mat83" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g84" type="mesh" mesh="mcd_rest_mesh84" material="mcd_rest_mat84" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g85" type="mesh" mesh="mcd_rest_mesh85" material="mcd_rest_mat85" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g86" type="mesh" mesh="mcd_rest_mesh86" material="mcd_rest_mat86" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g87" type="mesh" mesh="mcd_rest_mesh87" material="mcd_rest_mat87" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g88" type="mesh" mesh="mcd_rest_mesh88" material="mcd_rest_mat88" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g89" type="mesh" mesh="mcd_rest_mesh89" material="mcd_rest_mat89" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g90" type="mesh" mesh="mcd_rest_mesh90" material="mcd_rest_mat90" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g91" type="mesh" mesh="mcd_rest_mesh91" material="mcd_rest_mat91" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g92" type="mesh" mesh="mcd_rest_mesh92" material="mcd_rest_mat92" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g93" type="mesh" mesh="mcd_rest_mesh93" material="mcd_rest_mat93" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g94" type="mesh" mesh="mcd_rest_mesh94" material="mcd_rest_mat94" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g95" type="mesh" mesh="mcd_rest_mesh95" material="mcd_rest_mat95" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g96" type="mesh" mesh="mcd_rest_mesh96" material="mcd_rest_mat96" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g97" type="mesh" mesh="mcd_rest_mesh97" material="mcd_rest_mat97" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g98" type="mesh" mesh="mcd_rest_mesh98" material="mcd_rest_mat98" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g99" type="mesh" mesh="mcd_rest_mesh99" material="mcd_rest_mat99" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g100" type="mesh" mesh="mcd_rest_mesh100" material="mcd_rest_mat100" contype="0" conaffinity="0"/>
+      <geom name="mcd_rest_g101" type="mesh" mesh="mcd_rest_mesh101" material="mcd_rest_mat101" contype="0" conaffinity="0"/>
+    </body>
+  </worldbody>
+</mujoco>

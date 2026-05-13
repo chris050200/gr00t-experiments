@@ -1,0 +1,27 @@
+task_name: table_box_pick
+version: 0
+
+scene_source:
+  mode: existing_table_pnp
+  note: "Start from current table_pnp scene; switch to dedicated MJCF later if needed."
+
+object:
+  name: box
+  spawn_frame: world
+  # Matches MJCF body ``table_box`` (tabletop ~0.705 m + box Z half-height 0.1754 m).
+  spawn_pos_xyz_m: [0.72, 0.00, 0.8804]
+  spawn_rpy_deg: [0.0, 0.0, 0.0]
+
+goal:
+  type: lift_only
+  # ~0.16 m above resting box top (~1.056 m), preserving prior lift margin.
+  min_lift_height_m: 1.218
+  hold_steps: 20
+
+evaluation:
+  max_steps: 2500
+  record_jsonl: true
+  key_metrics:
+    - success
+    - time_to_first_grasp_steps
+    - failure_mode

@@ -1,0 +1,276 @@
+
+Mode: PLAN
+Plan: high-level health check + pre-feature cleanup
+1. Headline read of the repo
+The runtime physics + Gear-WBC stack is actually solid. The recent mj_jac point-frame fix in arm_ik_v2.py is a real win, and the module split (gear_wbc_config, gear_wbc_obs, gear_wbc_onnx, gear_wbc_pd, gear_wbc_teleop, gear_wbc_vr_stream, gear_wbc_vr_trace, gear_wbc_arm_ik) is the right shape. You also have a real Gym spine (g1_gear_wbc_env.py, G1GearWBC-v0 / G1GearWBC-TablePnP-v0) — that's a great foundation for everything you said you want.
+
+What's not solid: the boundary between "command source" (keyboard / VR / future policy / future motion primitive) and the runtime is leaky and undocumented; the entry-point layer is duplicated; the memory bank is partly stale, partly chronological-bug-diary; and there's enough dead/legacy/empty scaffolding around the active code that searching, reading, and onboarding all cost more than they should. None of that blocks bug fixes — but every one of them will hurt the moment you try to swap teleop, plug in motion primitives, or wire GR00T inference, which is exactly what you said is next.
+
+2. What to delete or git-ignore before doing anything else (zero-risk wins)
+Pure cruft. Removing these cleans the mental model with no behavior change. Recommend a single "housekeeping" PR.
+
+g1_diner_lab/ (top-level) — completely empty. The folder tree (g1_diner_lab/g1_diner_lab/{ik,sim,teleop,viz,pipeline}, scripts/, tests/, memory-bank/) contains zero .py/.md/.yaml files — only __pycache__/*.pyc and a .pytest_cache/. The source was deleted but the directory shells stayed. Delete the whole g1_diner_lab/ tree. Also the matching workspace rule reference if any.
+g1_minimal_sim/legacy/ — single README.md, no actual code. Either delete it (since the rule "move things here when detached" hasn't been followed in months and legacy_vr_code/ is the real legacy bucket), or fold the policy text into a comment in legacy_vr_code/__init__.py.
+g1_minimal_sim/ik/ — empty except for __pycache__. Delete.
+g1_minimal_sim/MUJOCO_LOG.TXT — committed by accident; .gitignore already lists it. git rm --cached it.
+g1_minimal_sim/__pycache__/ and tests/__pycache__/ — should be ignored in any case; if they're tracked, untrack them.
+vr_stream_ik_mode.py legacy strings — the pos/pose aliases are still emitted by play_g1_gear_wbc.py help text and spawn_g1_floor.py examples even though it's officially deprecated. Either drop the aliases now or stop advertising them; right now you have both, which is the worst of both worlds.
+Decide on IsaacTeleop/ — it's NVIDIA's upstream Isaac-Teleop checkout sitting at the workspace root (~140 KB metadata, full repo on disk). It's not imported anywhere in g1_minimal_sim. It belongs next to gr00t2/, not inside it, the same way the README handles Isaac-GR00T/. Move it to a sibling directory or document why it's nested.
+3. Memory-bank critique (read carefully — this is the highest-leverage cleanup)
+3a. Two memory banks exist and they don't agree on hierarchy
+gr00t2/memory-bank/ — has only one file (gr00t-g1-wholebody.md). Per your own core.mdc / memory-bank.mdc rules, this layer is supposed to host projectbrief.md, productContext.md, systemPatterns.md, techContext.md, activeContext.md, progress.md. It hosts none of them.
+g1_minimal_sim/memory-bank/ — has the full set (good!) but it's all about the sandbox, not the project as a whole.
+That's a real problem because as you start adding things outside g1_minimal_sim/ (motion primitives library, agent runtime, dataset code, the eventual g1_diner_lab v2), there's no place to write project-level context, and AI agents (including me, on the next reset) will keep treating g1_minimal_sim/memory-bank/ as the project root. Pick one of two paths:
+
+Path A (recommended): promote g1_minimal_sim/memory-bank/ to be the workspace's primary memory bank, since 95% of work happens there. Keep gr00t-g1-wholebody.md there too. Delete gr00t2/memory-bank/ (or leave a one-line README pointing inward). Loses no information.
+Path B: keep both, but write a real gr00t2/memory-bank/projectbrief.md that scopes the whole repo (sandbox + future motion primitives + agent layer + data + Isaac-GR00T integration) and demote g1_minimal_sim/memory-bank/ to a sub-component bank. More work, more useful long-term.
+I'd pick A today and revisit if you genuinely add a second peer subproject.
+
+3b. progress.md and activeContext.md are bug-diaries, not living roadmaps
+progress.md is 209 lines and ~80% of it is chronological "X landed in May 2026 (RESOLVED by Y)" entries — useful in the moment, near-useless 60 days later.
+activeContext.md opens with a 1100-character paragraph re-stating the same mj_jac bug you describe again 3 more times in progress.md and stylish_diner_keyboard_teleop.md.
+Concrete fixes:
+
+Compress everything resolved into a 5-bullet "Resolved bugs (history)" appendix or a CHANGELOG.md, keep progress.md body to current roadmap + open items only.
+Single source of truth for each fact. The mj_jac story shows up in 4+ files (activeContext.md, progress.md, stylish_diner_keyboard_teleop.md, ik_lock_transform_forensics.md). Pick one canonical writeup (likely ik_lock_transform_forensics.md) and have the rest link to it.
+activeContext.md should be < 80 lines ("what am I touching this week"). Currently 109 lines and reads like a wiki page.
+3c. Stale memory-bank files
+udp_openvr_split_teleop.md, vr_pose_udp_stream.md — both flagged "Legacy" in their first paragraph, both still listed as primary in INDEX.md. They duplicate context that's already covered better by vr_stream_debug_overlays.md and the live vr_teleop/ package. Move them into memory-bank/legacy/ or delete and keep one paragraph at the bottom of vr_stream_debug_overlays.md.
+The INDEX.md "Operator note (Apr 2026)" and "Best current teleop path" should live at the top of activeContext.md (or be auto-derived from CLI help) — they go stale in INDEX.md.
+3d. Missing memory-bank pieces (vs what your goals need)
+You want VR teleop, keyboard teleop, motion primitives, GR00T inference, and eventually an agent. There is currently no doc for:
+
+A command-source contract ("anything that mutates control_dict must obey rules X, Y, Z; here are the keys it owns; here is the locking discipline; here is how you swap one for another"). Right now this is implicit in gear_wbc_stand.step_physics.
+A motion-primitive design note (what's a primitive, what's its API, how does it compose with teleop, who owns the state machine).
+A GR00T integration plan beyond §B–E. manipulation_and_gr00t_plan.md is good for where the env shape is going but it doesn't say which file will host the obs-dict builder, which file will host the policy client adapter, etc.
+These should each be a small (≤60-line) memory-bank doc before you write the code, so the AI assistant on the other side of every reset has the right scaffolding.
+
+4. Codebase critique (in roughly priority order)
+4a. gear_wbc_stand.GearWBCRuntime.__init__ is a 35-argument god constructor
+The class is reasonable, but the constructor takes 35 keyword arguments, mostly VR/forensic/log knobs:
+
+
+gear_wbc_stand.py
+Lines 102-135
+    def __init__(
+        self,
+        resources_dir: Path,
+        *,
+        teleop: bool = False,
+        openvr_teleop: bool = False,
+        udp_teleop_bind: str | None = None,
+        vr_teleop_bind: str | None = None,
+        vr_receiver_yaw_deg: float = 0.0,
+        vr_ik_mode: str = "off",
+        vr_debug_stream: bool = False,
+        vr_debug_torso_z_mode: str = "full",
+        vr_debug_z_offset_m: float = 1.0,
+        vr_stream_calib_orient: str = "yaw_only",
+        vr_ik_anchor_mode: str = "legacy",
+        vr_head_orient_mode: str = "yaw_only",
+        vr_ik_z_offset_m: float = 0.0,
+        log_path: str | Path | None = None,
+        log_hz: float = 30.0,
+        log_append: bool = False,
+        forensic_burst: bool = False,
+        forensic_pre_steps: int = 180,
+        forensic_post_steps: int = 240,
+        forensic_trigger_pos_err_m: float = 0.15,
+        forensic_trigger_quat_err_deg: float = 45.0,
+        forensic_trigger_raw_step_l2: float = 1.0,
+        forensic_trigger_step_scale_max: float = 0.40,
+        forensic_cooldown_steps: int = 240,
+        control_dict: dict[str, Any] | None = None,
+        config_yaml: str = "g1_gear_wbc.yaml",
+        keyboard_grasp_primitives: bool = False,
+        lock_ee_orient: bool = False,
+        freeze_arms_when_walk: bool = False,
+    ) -> None:
+The exact same wall is then duplicated in run_gear_wbc(), G1GearWBCEnv.__init__(), and the argparse setup of both play_g1_gear_wbc.py and spawn_g1_floor.py. Adding one flag costs 5 edits. This is the #1 thing that will hurt when you wire VR teleop + keyboard teleop + motion primitives all together, because each new source brings its own knobs.
+
+Refactor: group args into 4–5 small dataclasses living next to their owning module:
+
+VRConfig (everything vr_*) → gear_wbc_vr_stream.py
+TraceConfig (log_*, forensic_*) → gear_wbc_vr_trace.py (or new gear_wbc_logging.py)
+IKConfig (the _ARM_IK_* constants currently as module globals + arm_ik_* runtime attrs) → gear_wbc_arm_ik.py
+TeleopConfig (enable_teleop, keyboard_grasp_primitives, lock_ee_orient, future freeze_arms_when_walk, --motion-primitive, etc.) → gear_wbc_teleop.py
+Then GearWBCRuntime(resources_dir, *, vr=VRConfig(...), ik=IKConfig(...), teleop=TeleopConfig(...), trace=TraceConfig(...)). CLI builders convert argparse → these dataclasses. The benefit isn't just shorter signatures — it lets you write "swap a config" code (teleop=KeyboardConfig() vs teleop=VRConfig() vs teleop=PolicyConfig()), which is exactly the modularity you said you want.
+
+4b. play_g1_gear_wbc.py and spawn_g1_floor.py duplicate ~70% of their argparse and runtime wiring
+spawn_g1_floor.py (391 lines) and play_g1_gear_wbc.py (526 lines) both:
+
+accept the same --vr-*, --debug-*, --scene, --task, --hands, --teleop, --udp-teleop, --vr-ik flags
+run the same Gear WBC stack (spawn → run_gear_wbc() direct; play → gym.make → same GearWBCRuntime)
+maintain two slightly-divergent help strings and validation checks
+This is technical debt with a clear "real" answer: Phase 2a is done, the Gym spine is the spine. spawn_g1_floor.py should either be:
+
+(recommended) deleted in favor of play_g1_gear_wbc.py; keep spawn_g1_floor.py only as a thin "passive physics + frame screenshot" demo (the part that doesn't go through Gear WBC at all). That's the original "minimal sim entrypoint" intent.
+or, kept as-is but factored to share an _argparse_common.py module so both CLIs build identical arg sets from one source.
+Right now spawn_g1_floor.py is essentially a --stand shim that re-implements play_g1_gear_wbc.py's subset of behavior going through the non-Gym path. Memory bank already says the Gym path is canonical.
+
+4c. The IK family is fragmented — the boundary between modules isn't crisp
+You currently have:
+
+File	Role	Used by
+arm_ik.py
+Joint specs, FK, ref-frame helpers, keyboard EE keymap
+runtime, VR stream, teleop, tests
+arm_ik_v2.py
+Stacked dual-arm DLS solver (the "live" solver)
+gear_wbc_arm_ik.py
+arm_ik_posture.py
+Posture rows for the stacked normal equations
+arm_ik_v2.py
+gear_wbc_arm_ik.py
+Per-step driver: clip / blend / lock / hand-fill / trace
+gear_wbc_stand.GearWBCRuntime.step_physics
+ee_frame.py
+Ref-body ↔ world quaternion math
+everyone
+vr_stream_ik_mode.py
+String normalizers
+CLIs
+The pieces are individually fine. The problem is arm_ik.py is doing four things at once: (1) build IK specs, (2) pure FK helpers, (3) ref ↔ world conversion (overlaps with ee_frame.py!), and (4) keyboard EE deltas (apply_ik_arm_teleop_key + _POS_STEP + _ANG_STEP). Item (4) is teleop input handling and shouldn't live next to the IK math. That makes "swap to VR teleop" harder than it needs to be, because keyboard EE keymap is glued to IK specs.
+
+Suggested reshape (no big rewrite):
+
+arm/
+  __init__.py
+  specs.py          # ArmSideIK, build_g1_arm_ik_specs (was arm_ik top half)
+  fk.py             # body_palm_pose, ee_world_targets_for_ik (was arm_ik middle)
+  solver.py         # solve_dual_arm_ik_v2 (was arm_ik_v2.py)
+  posture.py        # augment_task_with_posture (was arm_ik_posture.py)
+  step.py           # apply_arm_ik_step + _limit_arm_ik_step + _lock_ee_quats_to_home_under_teleop (was gear_wbc_arm_ik.py)
+teleop/
+  __init__.py
+  keyboard.py       # apply_ik_arm_teleop_key, reset_ee_to_home, key constants (was arm_ik bottom)
+  primitives.py     # current keyboard_grasp_primitives.py
+  vr_stream.py      # current gear_wbc_vr_stream.py
+  vr_trace.py       # current gear_wbc_vr_trace.py
+  loco_keys.py      # current gear_wbc_teleop.py
+You don't have to do this in one PR. But you do want one strict invariant from now on: IK code never imports keyboard or VR code. Right now arm_ik.py is "IK + a keyboard keymap" and gear_wbc_teleop.py imports from arm_ik.py — that's the wrong direction.
+
+4d. There's no CommandSource abstraction — and you're about to need one
+You said:
+
+Definitely want to have like the modularity to be able to swap in VR teleop, or just keyboard teleop, I wanna add those motion primitives to be able to liek , keyboard teleop pick up a box lift it drop it.
+
+Right now, every command source mutates control_dict directly:
+
+Keyboard listener (gear_wbc_teleop.start_gear_wbc_teleop_listener) — pynput thread, mutates under cmd_lock.
+Legacy UDP receiver (legacy_vr_code.udp_teleop_receiver.start_udp_receiver_for_runtime) — UDP thread, apply_udp_packet_to_control_dict.
+New VR stream (vr_teleop.openvr_stream.OpenvrStreamUdpReceiver) — UDP thread, apply_vr_stream_locomotion + apply_vr_stream_ik_targets from inside step_physics.
+OpenVR (openvr_teleop external module that may or may not exist) — its own poller.
+Each lives in a different place, has a different lifecycle, and has its own way of applying values. step_physics has a hard-coded order:
+
+
+gear_wbc_stand.py
+Lines 504-511
+        vr_snap, vr_t_rx = snapshot_vr_receiver(self)
+        apply_vr_stream_locomotion(self, vr_snap, vr_t_rx)
+        sync_keyboard_loco_hold(self, vr_snap, vr_t_rx)
+        vr_ik_trace = apply_vr_stream_ik_targets(self, vr_snap, vr_t_rx)
+That's fine now, but adding "motion primitive driving the arms while keyboard drives the legs while VR is idle" or "GR00T policy outputs navigate_command while keyboard reset key still works" turns this into a tangle of if-priorities very fast.
+
+Proposal — define a tiny CommandSource protocol, e.g.:
+
+class CommandSource(Protocol):
+    name: str  # "keyboard", "vr_stream", "udp_v1", "primitive:pick_box", "policy:gr00t"
+    owns: frozenset[str]  # which control_dict keys this source writes
+    priority: int
+    def start(self, rt: GearWBCRuntime) -> None: ...
+    def stop(self) -> None: ...
+    def apply(self, rt: GearWBCRuntime) -> dict[str, Any]:  # returns a per-step trace dict
+        ...
+Then GearWBCRuntime keeps an ordered list of sources and each step_physics is for src in self.sources: src.apply(self) plus a tiny conflict policy ("higher priority wins on overlapping keys; unowned keys fall through"). Concrete benefits:
+
+VR vs keyboard swap is --teleop {keyboard, vr, vr+keyboard, none} — one flag, no wall of validation.
+Motion primitives ("pick up the box") become a CommandSource that runs its own state machine, owns ee_*_pos for some seconds, then yields back. Same protocol as keyboard — they automatically compose.
+GR00T inference is one more CommandSource that owns arm_target_q + loco_cmd.
+The agent layer ("agentic stuff") is a meta-source that picks which source is active — trivial to wire later.
+That's 50–80 lines of new code plus moving the existing 4 sources to obey it. It's the single highest-leverage refactor for your stated future goals.
+
+4e. Locking and threading are already brittle
+Currently:
+
+Keyboard listener thread mutates control_dict under cmd_lock.
+UDP threads call apply_udp_packet_to_control_dict inside step_physics under cmd_lock (good).
+VR stream snapshot is read outside lock and the result is then applied inside step_physics (mostly OK, see apply_vr_stream_*).
+sync_keyboard_loco_hold interacts with the keyboard listener's pressed-key set under the same lock.
+Module-level mutable state: _loco_pressed: set[str] and _teleop_print_lock in gear_wbc_teleop.py — that's process-global, not per-runtime. Fine for one sim, but if you ever spawn two GearWBCRuntimes (e.g. for parallel envs in a future agentic harness), this will silently cross-contaminate.
+If CommandSource lands, make _loco_pressed an instance attr of the keyboard source, not a module global. One paragraph of work; saves one whole class of future bug.
+
+4f. The legacy_vr_code/ package is still in the import graph
+gear_wbc_stand.py imports:
+
+
+gear_wbc_stand.py
+Lines 64-67
+from legacy_vr_code.udp_teleop_receiver import (
+    apply_udp_packet_to_control_dict,
+    start_udp_receiver_for_runtime,
+)
+So --udp-teleop (v1) is not actually legacy — it's still wired into the live runtime. Memory bank calls it legacy, code calls it active. Pick one. Two clean choices:
+
+(recommended) Stop calling it "legacy". Move udp_teleop_receiver.py into vr_teleop/ next to openvr_stream.py, since they're the same conceptual layer (sim-side UDP receivers for two different sender protocols). Delete the --udp-teleop flag entirely if you've moved on, or rename legacy_vr_code/ → vr_teleop/legacy_v1/ so the import still works but the name doesn't lie.
+Or actually retire v1 + delete the receiver, the client, and the four tests that use it.
+You currently have 5 tests (test_vr_pov_*.py, test_vr_steamvr_mujoco_mapping.py, test_vr_teleop_root_motion.py, test_udp_teleop_bind.py) pinning legacy code that the docs say is going away.
+
+4g. Memory-bank-claimed-fixed bug still has no live VR confirmation
+activeContext.md and progress.md both list "Re-validate live VR ~180° spin" as the open item after the mj_jac fix. This is the open user-facing risk that affects whether your VR teleop currently works as advertised. It's also the only thing on the "Next" list that requires an actual VR session to clear. Worth doing before any of the larger refactors above, so you know the current baseline is real.
+
+4h. Tests directory is healthy but a little fragmented
+20 unit tests + a teleop_regression/ subfolder with the regression harness. Mostly good. Two minor things:
+
+tests/teleop_regression/table_box_walk_regression.py is an executable harness, not a pytest test, but lives in tests/. There's also tests/teleop_regression/test_table_box_walk_teleop_regression.py which presumably is a pytest. Move the harness to scripts/ (which exists in g1_diner_lab/ ironically) or tools/ so pytest tests/ doesn't accidentally evaluate it.
+tests/test_vr_pov_*.py import legacy stuff (see 4f). Tie them to whichever choice you make there.
+4i. Small but worth fixing
+gear_wbc_stand.py carries freeze_arms_when_walk plumbing but play_g1_gear_wbc.py and spawn_g1_floor.py don't expose it. Either expose it as a CLI flag or remove the parameter — undocumented runtime knobs go stale.
+gear_wbc_stand.run_gear_wbc(...) does not pass freeze_arms_when_walk even though GearWBCRuntime.__init__ accepts it, so the path is unreachable from spawn_g1_floor.py.
+play_g1_gear_wbc.py re-imports from g1_gear_wbc_env import ... inside main() to avoid an early gym dep. Fine, but inconsistent with spawn_g1_floor.py which imports lazily everywhere. Pick one style.
+_ARM_IK_* constants live as module globals in gear_wbc_stand.py, then are immediately copied into self.arm_ik_* attributes, but they're never reloaded anywhere. Just put them on IKConfig (see 4a) — gives you a place to override per env.
+5. Recommended action plan, ordered for your stated goals
+Phases are sized to be one PR each. Each phase is a no-regression invariant: existing teleop + headless + tests must keep passing.
+
+Phase 0 — Hygiene (no behavior change). Half a day.
+
+Delete g1_diner_lab/ (top-level, empty), g1_minimal_sim/legacy/, g1_minimal_sim/ik/, MUJOCO_LOG.TXT.
+Move or document IsaacTeleop/.
+Decide on the legacy_vr_code/ rename per 4f.
+Pick path A of 3a: delete gr00t2/memory-bank/ (after copying gr00t-g1-wholebody.md into g1_minimal_sim/memory-bank/).
+Compress progress.md "Working now" into a one-page status + history appendix; collapse the mj_jac story to a single canonical writeup in ik_lock_transform_forensics.md.
+Stop advertising pos/pose in CLI help if you've already deprecated them; or keep them and stop calling them deprecated.
+Phase 1 — Live-VR re-validation (a single session, no code).
+
+Run the user-validated baseline command from INDEX.md and confirm the ~180° spin is also resolved by the mj_jac fix. Update activeContext.md to close that item. Until this is done, you have no current ground truth on VR.
+Phase 2 — Config dataclasses (modularity step 1). One day.
+
+Introduce VRConfig, TraceConfig, IKConfig, TeleopConfig as the only inputs to GearWBCRuntime (and to G1GearWBCEnv and run_gear_wbc). Argparse builds them. play_g1_gear_wbc.py becomes a thin "argparse → configs → gym.make" file.
+Same PR: collapse play_g1_gear_wbc.py and spawn_g1_floor.py into one entry point (or factor _argparse_common.py).
+Tests should not change.
+Phase 3 — CommandSource protocol (modularity step 2 — the big one for your goals). 1–2 days.
+
+Define the protocol from 4d. Adapt the four existing sources (KeyboardSource, VrStreamSource, UdpV1Source, OpenVRPollerSource) to it. step_physics becomes a clean ordered loop.
+Move _loco_pressed to be a per-source instance attribute.
+--teleop {keyboard, vr, vr+keyboard, none} replaces today's individual flags (keep the old flags as aliases for one release).
+Phase 4 — Motion primitives library. 1–2 days for the framework + 1 primitive.
+
+New motion_primitives/ package with one MotionPrimitive(CommandSource) example: pick_lift_drop_box (box pose argument, opens grippers, moves above, descends, closes, lifts, moves to drop, opens). Initially scripted, no perception. Activated by a key in the keyboard source, or by --motion-primitive pick_lift_drop_box.
+Makes the "pick up a box, lift, drop" goal concrete and gives you a smoke task that's not "push the box around the diner".
+Memory bank doc: a small motion_primitives_design.md.
+Phase 5 — IK reshape (only if Phase 3 didn't already loosen it enough). Optional.
+
+The package layout from 4c. Pure refactor; tests pin it.
+Phase 6 — GR00T inference plumbing (your existing §B–E plan, now grounded in the new abstractions).
+
+Add GrootPolicySource(CommandSource) that owns arm_target_q, loco_cmd, hands. Obs-dict builder lives next to G1GearWBCEnv. Local + client modes.
+Now this is straightforward because you already have a swappable command source.
+Phase 7 — Agent layer.
+
+A "meta-source" that picks which source is active, possibly invoking motion primitives. By the time you get here, CommandSource has done all the heavy lifting.
+6. Things I'd specifically not do right now
+Don't rewrite the IK solver. It just got the right fix and has a real test (FD comparison + monkeypatch contract). Touching it again before live-VR confirmation would muddle attribution.
+Don't merge/replace the Gym env yet. It's fine. Don't wedge the MultiStepWrapper / GR00T obs in until Phase 6.
+Don't introduce a "registry" for scenes/tasks beyond the current task_scene.py + resolve_gear_wbc_config. They're already overlapping (--scene + --task + --config-yaml). One more layer is the wrong direction; instead, move resolve_gear_wbc_config's scene logic into task_scene.py so there's a single resolver, even for the built-in floor / table_pnp / stylish_diner cases. Then --scene becomes "task with default spec", --task becomes "task with explicit spec".
+Don't fight the diner arm-walk bug as a separate bug from the mj_jac fix until after live VR re-validation. If progress.md is right that they shared a solver path, the diner symptom should also be gone. Confirm before adding a separate ticket.
+Don't over-document. Resist the urge to write 4 new memory-bank files in the housekeeping PR. Cut first, write later.

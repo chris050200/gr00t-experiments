@@ -1,0 +1,30 @@
+<mujoco model="so100_plane">
+    <compiler angle="radian"/>
+
+    <option gravity="0 0 -9.81" timestep="0.002"/>
+
+    <statistic extent="1.5" center="0.25 0 0.35"/>
+
+    <visual>
+        <map fogstart="2" fogend="6" force="0.1" znear="0.05"/>
+        <quality shadowsize="2048" offsamples="4"/>
+        <headlight ambient="0.35 0.35 0.35" diffuse="0.55 0.55 0.55" specular="0.25 0.25 0.25"/>
+    </visual>
+
+    <asset>
+        <texture name="texchecker" type="2d" builtin="checker" width="512" height="512"
+            rgb1="0.15 0.17 0.2" rgb2="0.25 0.27 0.3" mark="edge" markrgb="0.85 0.87 0.9"/>
+        <material name="matchecker" texture="texchecker" texrepeat="8 8" reflectance="0.12"/>
+    </asset>
+
+    <include file="trs_so_arm100/so_arm100.xml"/>
+
+    <worldbody>
+        <light name="top" pos="0 0 2.5" dir="0 0 -1" directional="true" diffuse="0.45 0.45 0.45"
+            specular="0.2 0.2 0.2"/>
+        <light name="side" pos="1.5 1.5 1.8" dir="-1 -1 -1" directional="true" diffuse="0.35 0.35 0.35"
+            specular="0.12 0.12 0.12"/>
+
+        <geom name="floor" type="plane" pos="0 0 0" size="4 4 0.01" material="matchecker"/>
+    </worldbody>
+</mujoco>

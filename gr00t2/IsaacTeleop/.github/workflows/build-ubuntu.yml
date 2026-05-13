@@ -1,0 +1,672 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build Ubuntu
+
+on:
+  push:
+    branches: [ main, 'release/*.*.x' ]
+    tags: [ 'v*' ]
+  pull_request:
+
+# For PRs, we want to cancel in-progress runs to save resources.
+# For pushes to main or releases, we want to allow all runs to complete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-ubuntu:
+    # Pin to 22.04 so the wheel is built with GCC 11's libstdc++. The resulting wheel
+    # then runs on both Ubuntu 22.04 and 24.04 (24.04's libstdc++ is backward compatible).
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-22.04-arm' || 'ubuntu-22.04' }}
+
+    strategy:
+      matrix:
+        build_type: ["Debug", "Release"]
+        python_version: ['3.10', '3.11', '3.12', '3.13']
+        arch: ['x64', 'arm64']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0 # Full history for accurate git describe
+
+    - name: Install uv
+      uses: ./.github/actions/setup-uv
+
+    - name: Install Apt dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libx11-dev clang-format-14 ccache
+
+    - name: Install patchelf (Release only)
+      if: ${{ matrix.build_type == 'Release' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y patchelf
+    - name: Setup CloudXR SDK
+      id: cloudxr-sdk
+      uses: ./.github/actions/setup-cloudxr-sdk
+      with:
+        ngc-cli-api-key: ${{ secrets.NGC_TELEOP_CORE_GITHUB_SERVICE_KEY }}
+
+    # Hunter cache - caches depthai dependencies (OpenSSL, CURL, etc.)
+    - name: Cache Hunter packages
+      uses: actions/cache@v5
+      with:
+        path: ~/.hunter
+        key: hunter-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cmake/SetupHunter.cmake') }}
+        restore-keys: |
+          hunter-${{ runner.os }}-${{ runner.arch }}-
+
+    - name: Cache ccache
+      uses: actions/cache@v5
+      with:
+        path: ~/.cache/ccache
+        key: ccache-${{ runner.os }}-${{ runner.arch }}-${{ matrix.build_type }}-py${{ matrix.python_version }}-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ccache-${{ runner.os }}-${{ runner.arch }}-${{ matrix.build_type }}-py${{ matrix.python_version }}-
+
+    - name: Verify ccache
+      run: |
+        ccache --version
+        ccache --show-config
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DISAAC_TELEOP_PYTHON_VERSION=${{ matrix.python_version }} \
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+          -DBUILD_PLUGIN_OAK_CAMERA=ON \
+          -DENABLE_CLOUDXR_BUNDLE_CHECK=ON
+
+    - name: Build
+      run: cmake --build build --parallel 4
+
+    - name: ccache stats
+      run: ccache --show-stats
+
+    - name: Run All Tests
+      run: ctest --test-dir build --output-on-failure --parallel
+
+    - name: Install (Release only)
+      if: matrix.build_type == 'Release'
+      run: cmake --install build
+
+    - name: Repair wheel tags with auditwheel (Release only)
+      if: matrix.build_type == 'Release'
+      run: |
+        set -euo pipefail
+
+        shopt -s nullglob
+        wheels=(install/wheels/*.whl)
+        if (( ${#wheels[@]} == 0 )); then
+          echo "No wheels found under install/wheels/*.whl"
+          ls -la install/wheels || true
+          exit 1
+        fi
+
+        mkdir -p install/wheels-repaired
+        for wheel in "${wheels[@]}"; do
+          echo "Repairing ${wheel}"
+          # Exclude GPU driver/runtime libs so wheels stay portable across systems without bundling host-specific binaries.
+          uv run --python ${{ matrix.python_version }} --with "auditwheel==6.6.0" \
+            auditwheel repair --exclude libcuda.so.1 --exclude libvulkan.so.1 --wheel-dir install/wheels-repaired "${wheel}"
+        done
+
+        rm -f install/wheels/*.whl
+        mv install/wheels-repaired/*.whl install/wheels/
+        rmdir install/wheels-repaired || true
+
+    - name: Create tarball to preserve permissions
+      if: matrix.build_type == 'Release'
+      run: tar -cvf isaacteleop-install.tar -C install .
+
+    - name: Upload Release artifacts
+      if: matrix.build_type == 'Release'
+      uses: actions/upload-artifact@v6
+      with:
+        name: isaacteleop-install-release-${{ matrix.arch }}-py${{ matrix.python_version }}
+        path: isaacteleop-install.tar
+        retention-days: 1
+    - name: Upload wheel artifacts
+      if: matrix.build_type == 'Release'
+      uses: actions/upload-artifact@v6
+      with:
+        name: isaacteleop-wheels-${{ matrix.arch }}-py${{ matrix.python_version }}
+        path: install/wheels/*.whl
+        if-no-files-found: error
+        retention-days: 1
+
+  test-cloudxr:
+    runs-on: [self-hosted, linux, gpu, "${{ matrix.arch }}"]
+    needs: build-ubuntu
+
+    strategy:
+      matrix:
+        python_version: ['3.10', '3.11', '3.12', '3.13']
+        arch: ['x64', 'arm64']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install uv
+      uses: ./.github/actions/setup-uv
+
+    - name: Download install artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: isaacteleop-install-release-${{ matrix.arch }}-py${{ matrix.python_version }}
+
+    - name: Extract tarball to preserve permissions
+      run: |
+        mkdir -p install
+        tar -xvf isaacteleop-install.tar -C install
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Run Tests with CloudXR
+      env:
+        CI: true
+        ACCEPT_CLOUDXR_EULA: Y
+      run: |
+        # Create .env file with EULA acceptance
+        echo "ACCEPT_CLOUDXR_EULA=Y" > deps/cloudxr/.env
+
+        # Run tests with CloudXR runtime
+        ./scripts/run_tests_with_cloudxr.sh --python-version ${{ matrix.python_version }}
+
+  test-teleop-ros2:
+    runs-on: [self-hosted, linux, gpu, "${{ matrix.arch }}"]
+    needs: build-ubuntu
+
+    strategy:
+      matrix:
+        python_version: ['3.10', '3.12']
+        arch: ['x64', 'arm64']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install uv
+      uses: ./.github/actions/setup-uv
+
+    - name: Download install artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: isaacteleop-install-release-${{ matrix.arch }}-py${{ matrix.python_version }}
+
+    - name: Extract tarball to preserve permissions
+      run: |
+        mkdir -p install
+        tar -xvf isaacteleop-install.tar -C install
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Set ROS Distro
+      id: ros-distro
+      run: |
+        if [ "${{ matrix.python_version }}" = "3.10" ]; then
+          echo "ROS_DISTRO=humble" >> $GITHUB_ENV
+        elif [ "${{ matrix.python_version }}" = "3.12" ]; then
+          echo "ROS_DISTRO=jazzy" >> $GITHUB_ENV
+        fi
+
+    - name: Build teleop_ros2 image
+      run: |
+        docker build -f examples/teleop_ros2/Dockerfile \
+          --build-arg ROS_DISTRO=${{ env.ROS_DISTRO }} \
+          --build-arg PYTHON_VERSION=${{ matrix.python_version }} \
+          -t teleop_ros2_ref:${{ env.ROS_DISTRO }} .
+
+    - name: Verify application modes
+      env:
+        ACCEPT_CLOUDXR_EULA: Y
+        CXR_BUILD_CONTEXT: ${{ github.workspace }}
+        CXR_RUNTIME_NETWORK_MODE: bridge
+        PYTHON_VERSION: ${{ matrix.python_version }}
+        ISAACTELEOP_PIP_DEBUG: "0"
+        ISAACTELEOP_PIP_FIND_LINKS: /workspace/install/wheels
+        ISAACTELEOP_PIP_SPEC: isaacteleop[cloudxr]
+      run: |
+        source scripts/setup_cloudxr_env.sh
+
+        PROJECT_NAME="isaacteleop-test-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.arch }}-${{ env.ROS_DISTRO }}"
+        LOG_FILE_BASE="/tmp/ros2_test_output_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}_${{ matrix.arch }}_${{ env.ROS_DISTRO }}"
+        STARTUP_MARKER="TeleopSession started successfully"
+        READINESS_TIMEOUT_SEC=30
+        READINESS_POLL_INTERVAL_SEC=1
+
+        # Cleanup
+        trap 'docker compose -p "$PROJECT_NAME" \
+          --env-file "$ENV_DEFAULT" \
+          ${ENV_LOCAL:+--env-file "$ENV_LOCAL"} \
+          -f deps/cloudxr/docker-compose.runtime.yaml \
+          -f deps/cloudxr/docker-compose.test.yaml \
+          -f deps/cloudxr/docker-compose.override.yaml \
+          down -v' EXIT
+
+        # Start CloudXR runtime
+        cat <<EOF > deps/cloudxr/docker-compose.override.yaml
+        services:
+          cloudxr-runtime:
+            container_name: "cloudxr-runtime-$PROJECT_NAME"
+        EOF
+
+        docker compose -p "$PROJECT_NAME" \
+          --env-file "$ENV_DEFAULT" \
+          ${ENV_LOCAL:+--env-file "$ENV_LOCAL"} \
+          -f deps/cloudxr/docker-compose.runtime.yaml \
+          -f deps/cloudxr/docker-compose.test.yaml \
+          -f deps/cloudxr/docker-compose.override.yaml \
+          up --build -d cloudxr-runtime
+
+        # Wait for healthy
+        healthy=false
+        for i in {1..30}; do
+          if docker compose -p "$PROJECT_NAME" \
+            --env-file "$ENV_DEFAULT" \
+            ${ENV_LOCAL:+--env-file "$ENV_LOCAL"} \
+            -f deps/cloudxr/docker-compose.runtime.yaml \
+            -f deps/cloudxr/docker-compose.test.yaml \
+            -f deps/cloudxr/docker-compose.override.yaml \
+            ps cloudxr-runtime | grep -q "healthy"; then
+            healthy=true
+            break
+          fi
+          sleep 2
+        done
+
+        if [ "$healthy" = false ]; then
+          echo "Error: CloudXR runtime failed to become healthy"
+          docker compose -p "$PROJECT_NAME" \
+            --env-file "$ENV_DEFAULT" \
+            ${ENV_LOCAL:+--env-file "$ENV_LOCAL"} \
+            -f deps/cloudxr/docker-compose.runtime.yaml \
+            -f deps/cloudxr/docker-compose.test.yaml \
+            -f deps/cloudxr/docker-compose.override.yaml \
+            logs cloudxr-runtime
+          exit 1
+        fi
+
+        # Run tests
+        for mode in controller_teleop hand_teleop controller_raw full_body; do
+          echo "Testing mode: $mode"
+          LOG_FILE="${LOG_FILE_BASE}_${mode}.log"
+          RUN_NAME="teleop-ros2-${PROJECT_NAME}-${mode//_/-}"
+          docker_rc=0
+          started=false
+
+          rm -f "$LOG_FILE"
+
+          docker run -d \
+            --name "$RUN_NAME" \
+            --gpus all \
+            --network host \
+            -v "$CXR_HOST_VOLUME_PATH:$CXR_HOST_VOLUME_PATH" \
+            -v /tmp:/tmp \
+            -e NV_CXR_RUNTIME_DIR="$CXR_HOST_VOLUME_PATH/.cloudxr/run" \
+            -e XR_RUNTIME_JSON="$CXR_HOST_VOLUME_PATH/.cloudxr/openxr_cloudxr.json" \
+            -e PYTHONUNBUFFERED=1 \
+            --entrypoint bash teleop_ros2_ref:${{ env.ROS_DISTRO }} -c \
+            "source /usr/local/bin/teleop-env-setup && exec uv run teleop_ros2_node.py --ros-args -p mode:=$mode -p use_mock_operators:=true" >/dev/null
+
+          deadline=$((SECONDS + READINESS_TIMEOUT_SEC))
+          while [ "$SECONDS" -lt "$deadline" ]; do
+            docker logs "$RUN_NAME" > "$LOG_FILE" 2>&1 || true
+
+            if [ -f "$LOG_FILE" ] && grep -q "$STARTUP_MARKER" "$LOG_FILE"; then
+              started=true
+              break
+            fi
+
+            running=$(docker inspect -f '{{.State.Running}}' "$RUN_NAME" 2>/dev/null || echo false)
+            if [ "$running" != "true" ]; then
+              docker_rc=$(docker inspect -f '{{.State.ExitCode}}' "$RUN_NAME" 2>/dev/null || echo 1)
+              break
+            fi
+
+            sleep "$READINESS_POLL_INTERVAL_SEC"
+          done
+
+          docker logs "$RUN_NAME" > "$LOG_FILE" 2>&1 || true
+
+          if [ "$started" = true ]; then
+            docker stop --time 5 "$RUN_NAME" >/dev/null || true
+            docker wait "$RUN_NAME" >/dev/null || true
+          else
+            running=$(docker inspect -f '{{.State.Running}}' "$RUN_NAME" 2>/dev/null || echo false)
+            if [ "$running" = "true" ]; then
+              echo "Error: TeleopSession did not report readiness within ${READINESS_TIMEOUT_SEC}s in mode $mode"
+              docker stop --time 5 "$RUN_NAME" >/dev/null || true
+              docker wait "$RUN_NAME" >/dev/null || true
+            else
+              echo "Error: teleop_ros2_node exited before readiness in mode $mode (exit code $docker_rc)"
+            fi
+          fi
+
+          docker rm -f "$RUN_NAME" >/dev/null 2>&1 || true
+
+          if [ -f "$LOG_FILE" ]; then
+            cat "$LOG_FILE"
+          else
+            echo "No test log captured at $LOG_FILE"
+          fi
+
+          if [ "$started" != true ]; then
+            exit 1
+          fi
+        done
+
+  publish-wheel:  # to internal Artifactory
+    runs-on: [self-hosted, linux]
+    needs:
+      - build-ubuntu
+      - test-cloudxr
+      - test-teleop-ros2
+    outputs:
+      wheel_paths: ${{ steps.upload-artifactory.outputs.wheel_paths }}
+    environment: dev
+
+    # Publish only for PRs wihtin the canonical repository after build and CloudXR tests succeed
+    if: >-
+      ${{
+        github.repository == 'NVIDIA/IsaacTeleop'
+        && needs.build-ubuntu.result == 'success'
+        && needs.test-cloudxr.result == 'success'
+        && needs.test-teleop-ros2.result == 'success'
+      }}
+
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+
+    - name: Ensure clean wheels directory
+      run: |
+        rm -rf wheels
+
+    - name: Download wheel artifacts
+      uses: actions/download-artifact@v7
+      with:
+        pattern: isaacteleop-wheels-*
+        merge-multiple: true
+        path: wheels
+
+    - name: Upload wheel(s) to Artifactory
+      id: upload-artifactory
+      env:
+        ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+        ARTIFACTORY_REPO: ${{ secrets.ARTIFACTORY_REPO }}
+        ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+        ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
+      run: |
+        set -euo pipefail
+
+        if [[ -z "${ARTIFACTORY_URL}" || -z "${ARTIFACTORY_REPO}" || -z "${ARTIFACTORY_USERNAME}" || -z "${ARTIFACTORY_API_KEY}" ]]; then
+          echo "Missing one or more required secrets: ARTIFACTORY_URL, ARTIFACTORY_REPO, ARTIFACTORY_USERNAME, ARTIFACTORY_API_KEY"
+          exit 1
+        fi
+
+        if [[ "${ARTIFACTORY_URL}" != https://* ]]; then
+          echo "ARTIFACTORY_URL must use https://"
+          exit 1
+        fi
+
+        shopt -s nullglob
+        wheels=(wheels/*.whl)
+        if (( ${#wheels[@]} == 0 )); then
+          echo "No wheels found under wheels/*.whl"
+          ls -la wheels || true
+          exit 1
+        fi
+
+        python -m pip install --upgrade pip twine
+
+        # Artifactory PyPI repositories use the PyPI API endpoint.
+        repository_url="${ARTIFACTORY_URL%/}/api/pypi/${ARTIFACTORY_REPO}"
+        echo "Publishing ${#wheels[@]} wheel(s)"
+
+        python -m twine upload \
+          --non-interactive \
+          --repository-url "${repository_url}" \
+          -u "${ARTIFACTORY_USERNAME}" \
+          -p "${ARTIFACTORY_API_KEY}" \
+          "${wheels[@]}"
+
+        wheel_base="${ARTIFACTORY_URL%/}/${ARTIFACTORY_REPO}"
+        wheel_prefix="${wheel_base}/"
+
+        wheel_paths=()
+        for wheel in "${wheels[@]}"; do
+          wheel_name="$(basename "${wheel}")"
+          echo "Resolving Artifactory URL for ${wheel_name}"
+
+          search_json="$(curl --fail-with-body --show-error --silent --location --get --connect-timeout 10 --max-time 60 \
+            -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_API_KEY}" \
+            --data-urlencode "name=${wheel_name}" \
+            --data-urlencode "repos=${ARTIFACTORY_REPO}" \
+            "${ARTIFACTORY_URL%/}/api/search/artifact")"
+
+          result_count="$(jq '.results | length' <<< "${search_json}")"
+          if [[ "${result_count}" -ne 1 ]]; then
+            echo "Expected exactly 1 Artifactory search result for ${wheel_name}, but got ${result_count}"
+            echo "${search_json}"
+            exit 1
+          fi
+
+          storage_uri="$(jq -r '.results[0].uri // empty' <<< "${search_json}")"
+          if [[ -z "${storage_uri}" ]]; then
+            echo "Unable to resolve storage URI for ${wheel_name}"
+            echo "${search_json}"
+            exit 1
+          fi
+
+          metadata_json="$(curl --fail-with-body --show-error --silent --location --connect-timeout 10 --max-time 60 \
+            -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_API_KEY}" \
+            "${storage_uri}")"
+
+          download_uri="$(jq -r '.downloadUri // empty' <<< "${metadata_json}")"
+          if [[ -z "${download_uri}" ]]; then
+            echo "Unable to resolve downloadUri for ${wheel_name}"
+            echo "${metadata_json}"
+            exit 1
+          fi
+
+          wheel_path="${download_uri#${wheel_prefix}}"
+          if [[ "${wheel_path}" == "${download_uri}" || -z "${wheel_path}" ]]; then
+            echo "Unable to clip Artifactory prefix from downloadUri for ${wheel_name}"
+            echo "Expected prefix: ${wheel_prefix}"
+            echo "${metadata_json}"
+            exit 1
+          fi
+
+          wheel_paths+=("${wheel_path}")
+        done
+
+        {
+          echo "wheel_paths<<EOF"
+          printf '%s\n' "${wheel_paths[@]}"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+
+  kitmaker:
+    runs-on: [self-hosted, linux]
+    needs:
+      - publish-wheel
+    outputs:
+      release_uuid: ${{ steps.submit-kitmaker.outputs.release_uuid }}
+    environment: release
+    permissions:
+      contents: read
+    if: ${{ github.event_name != 'pull_request' && needs.publish-wheel.result == 'success' }}
+
+    steps:
+    - name: Submit wheel release to Kitmaker
+      id: submit-kitmaker
+      env:
+        KITMAKER_API_ENDPOINT: ${{ secrets.KITMAKER_API_ENDPOINT }}
+        KITMAKER_PROJECT_ID: ${{ secrets.KITMAKER_PROJECT_ID }}
+        KITMAKER_TOKEN: ${{ secrets.KITMAKER_TOKEN }}
+        KITMAKER_PIC_EMAIL: ${{ secrets.KITMAKER_PIC_EMAIL }}
+        ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+        ARTIFACTORY_REPO: ${{ secrets.ARTIFACTORY_REPO }}
+        WHEEL_PATHS: ${{ needs.publish-wheel.outputs.wheel_paths }}
+        KITMAKER_UPLOAD: ${{ startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/tags/v') }}
+      run: |
+        set -euo pipefail
+
+        if [[ -z "${KITMAKER_API_ENDPOINT}" || -z "${KITMAKER_PROJECT_ID}" || -z "${KITMAKER_TOKEN}" || -z "${KITMAKER_PIC_EMAIL}" || -z "${ARTIFACTORY_URL}" || -z "${ARTIFACTORY_REPO}" ]]; then
+          echo "Missing one or more required secrets: KITMAKER_API_ENDPOINT, KITMAKER_PROJECT_ID, KITMAKER_TOKEN, KITMAKER_PIC_EMAIL, ARTIFACTORY_URL, ARTIFACTORY_REPO"
+          exit 1
+        fi
+
+        if [[ "${KITMAKER_API_ENDPOINT}" != https://* ]]; then
+          echo "KITMAKER_API_ENDPOINT must use https://"
+          exit 1
+        fi
+
+        if [[ "${ARTIFACTORY_URL}" != https://* ]]; then
+          echo "ARTIFACTORY_URL must use https://"
+          exit 1
+        fi
+
+        if [[ -z "${WHEEL_PATHS}" ]]; then
+          echo "No wheel paths were produced by publish-wheel job"
+          exit 1
+        fi
+
+        wheel_base="${ARTIFACTORY_URL%/}/${ARTIFACTORY_REPO}"
+
+        api_url="${KITMAKER_API_ENDPOINT%/}/v0/projects/${KITMAKER_PROJECT_ID}/releases"
+        payload_items=()
+        while IFS= read -r wheel_path; do
+          [[ -z "${wheel_path}" ]] && continue
+          wheel_url="${wheel_base}/${wheel_path}"
+          wheel_name="$(basename "${wheel_path}")"
+          echo "Queueing wheel for Kitmaker payload: ${wheel_name}"
+
+          payload_items+=("$(jq -cn \
+            --arg pic "${KITMAKER_PIC_EMAIL}" \
+            --arg url "${wheel_url}" \
+            --argjson upload "${KITMAKER_UPLOAD}" \
+            '{pic: $pic, job_type: "wheel-release-job", publish_to: "both_devzone_pypi", url: $url, size: "small", upload: $upload}')")
+          done <<< "${WHEEL_PATHS}"
+
+        if (( ${#payload_items[@]} == 0 )); then
+          echo "No valid wheel URLs found to submit to Kitmaker"
+          exit 1
+        fi
+
+        payload_array="$(printf '%s\n' "${payload_items[@]}" | jq -s '.')"
+        payload="$(jq -cn --arg project_name "isaacteleop" --argjson payload "${payload_array}" '{project_name: $project_name, payload: $payload}')"
+
+        echo "Posting ${#payload_items[@]} wheel(s) to Kitmaker in a single request"
+        response_json="$(curl --fail-with-body --show-error --silent --location --connect-timeout 10 --max-time 120 \
+          -X POST "${api_url}" \
+          -H "Authorization: Bearer ${KITMAKER_TOKEN}" \
+          -H "Content-Type: application/json" \
+          -d "${payload}")"
+        echo "${response_json}"
+
+        release_uuid="$(jq -r '.release_uuid // empty' <<< "${response_json}")"
+        if [[ -z "${release_uuid}" ]]; then
+          echo "Kitmaker response missing release_uuid"
+          exit 1
+        fi
+
+        echo "release_uuid=${release_uuid}" >> "$GITHUB_OUTPUT"
+
+  kitmaker-status:
+    runs-on: [self-hosted, linux]
+    needs:
+      - kitmaker
+    environment: release
+    permissions:
+      contents: read
+    if: ${{ github.event_name != 'pull_request' && needs.kitmaker.result == 'success' }}
+
+    steps:
+    - name: Monitor Kitmaker release status
+      env:
+        KITMAKER_API_ENDPOINT: ${{ secrets.KITMAKER_API_ENDPOINT }}
+        KITMAKER_PROJECT_ID: ${{ secrets.KITMAKER_PROJECT_ID }}
+        KITMAKER_TOKEN: ${{ secrets.KITMAKER_TOKEN }}
+        KITMAKER_RELEASE_UUID: ${{ needs.kitmaker.outputs.release_uuid }}
+        ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+        ARTIFACTORY_REPO: ${{ secrets.ARTIFACTORY_REPO }}
+      run: |
+        set -euo pipefail
+
+        # Redact sensitive values that may appear in API responses.
+        echo "::add-mask::${KITMAKER_API_ENDPOINT}"
+        echo "::add-mask::${KITMAKER_API_ENDPOINT%/}"
+        echo "::add-mask::${KITMAKER_RELEASE_UUID}"
+        echo "::add-mask::${KITMAKER_PROJECT_ID}"
+        echo "::add-mask::${ARTIFACTORY_URL}"
+        echo "::add-mask::${ARTIFACTORY_URL%/}"
+        echo "::add-mask::${ARTIFACTORY_REPO}"
+
+        if [[ -z "${KITMAKER_API_ENDPOINT}" || -z "${KITMAKER_TOKEN}" ]]; then
+          echo "Missing required secrets: KITMAKER_API_ENDPOINT, KITMAKER_TOKEN"
+          exit 1
+        fi
+
+        if [[ "${KITMAKER_API_ENDPOINT}" != https://* ]]; then
+          echo "KITMAKER_API_ENDPOINT must use https://"
+          exit 1
+        fi
+
+        if [[ -z "${KITMAKER_RELEASE_UUID}" ]]; then
+          echo "No release_uuid was produced by the kitmaker job"
+          exit 1
+        fi
+
+        status_url="${KITMAKER_API_ENDPOINT%/}/v0/status/${KITMAKER_RELEASE_UUID}"
+        # Limit total polling time to under an hour with exponential backoff starting at 30s
+        max_attempts=15
+        sleep_seconds=30
+
+        for ((attempt=1; attempt<=max_attempts; attempt++)); do
+          echo "Polling Kitmaker status (attempt ${attempt}/${max_attempts})"
+
+          response_json="$(curl --fail-with-body --show-error --silent --location --connect-timeout 10 --max-time 60 \
+            -H "Authorization: Bearer ${KITMAKER_TOKEN}" \
+            "${status_url}")"
+
+          echo "${response_json}"
+          status="$(jq -r '.status // empty' <<< "${response_json}")"
+
+          if [[ "${status}" == "completed" ]]; then
+            echo "Kitmaker release ${KITMAKER_RELEASE_UUID} completed"
+            exit 0
+          fi
+
+          if [[ "${status}" == "failed" ]]; then
+            echo "Kitmaker release ${KITMAKER_RELEASE_UUID} failed"
+            exit 1
+          fi
+
+          if (( attempt == max_attempts )); then
+            break
+          fi
+
+          sleep "${sleep_seconds}"
+          sleep_seconds=$(( sleep_seconds * 125 / 100 ))
+        done
+
+        echo "Timed out waiting for Kitmaker release ${KITMAKER_RELEASE_UUID} to complete"
+        exit 1

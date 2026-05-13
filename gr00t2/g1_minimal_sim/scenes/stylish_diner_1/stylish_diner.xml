@@ -1,0 +1,200 @@
+<mujoco model="basic_restaurant_open">
+  <!-- Shell cloned from g1_minimal_sim/scenes/stylish_diner_1/stylish_diner.xml.
+       Booth GLB: ONE asset definition (meshes/textures/materials), THREE bodies that reuse
+       the same mesh/material ids — MuJoCo loads each mesh once (same idea as GPU instancing).
+       Paths resolve relative to this XML file. -->
+  <compiler angle="degree" coordinate="local" meshdir="../scene_builder/scenes/stylish_diner_preview/assets/booth/meshes" texturedir="../scene_builder/scenes/stylish_diner_preview/assets/booth/textures"/>
+
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+
+  <visual>
+    <headlight diffuse="0.65 0.65 0.65" ambient="0.40 0.36 0.32"/>
+    <rgba haze="0.10 0.10 0.11 1"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.35 0.38 0.42" rgb2="0.18 0.17 0.16" width="512" height="3072"/>
+    <!-- Floor albedo: procedural tileable PNG in assets/booth/textures/ (see g1_minimal_sim/scenes/scene_builder/tools/gen_stylish_diner_floor_texture.py) -->
+    <texture name="wood" type="2d" file="stylish_diner_floor_planks.png"/>
+    <material name="floor_wood" texture="wood" texrepeat="12.5 9.1" reflectance="0" specular="0" shininess="1"/>
+    <material name="wall" rgba="0.76 0.69 0.58 1"/>
+    <material name="dark_metal" rgba="0.10 0.10 0.10 1"/>
+    <material name="bar_wood" rgba="0.34 0.18 0.09 1"/>
+    <material name="booth_red" rgba="0.38 0.08 0.05 1"/>
+    <material name="table_top" rgba="0.25 0.14 0.07 1"/>
+    <material name="felt" rgba="0.05 0.32 0.18 1"/>
+    <material name="blue_target" rgba="0.15 0.35 0.85 1"/>
+    <material name="light_gray" rgba="0.72 0.72 0.72 1"/>
+    <material name="ceramic_white" rgba="0.95 0.95 0.93 1"/>
+
+    <!-- Imported booth (sb_*): shared across booth_inst_0..2 — load once, draw thrice -->
+    <mesh name="sb_booth_mesh00" file="sb_booth_m00.obj"/>
+    <texture name="sb_booth_tex00" type="2d" file="sb_booth_t00.png"/>
+    <material name="sb_booth_mat00" texture="sb_booth_tex00" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh01" file="sb_booth_m01.obj"/>
+    <texture name="sb_booth_tex01" type="2d" file="sb_booth_t01.png"/>
+    <material name="sb_booth_mat01" texture="sb_booth_tex01" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh02" file="sb_booth_m02.obj"/>
+    <texture name="sb_booth_tex02" type="2d" file="sb_booth_t02.png"/>
+    <material name="sb_booth_mat02" texture="sb_booth_tex02" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh03" file="sb_booth_m03.obj"/>
+    <texture name="sb_booth_tex03" type="2d" file="sb_booth_t03.png"/>
+    <material name="sb_booth_mat03" texture="sb_booth_tex03" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh04" file="sb_booth_m04.obj"/>
+    <texture name="sb_booth_tex04" type="2d" file="sb_booth_t04.png"/>
+    <material name="sb_booth_mat04" texture="sb_booth_tex04" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh05" file="sb_booth_m05.obj"/>
+    <texture name="sb_booth_tex05" type="2d" file="sb_booth_t05.png"/>
+    <material name="sb_booth_mat05" texture="sb_booth_tex05" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh06" file="sb_booth_m06.obj"/>
+    <texture name="sb_booth_tex06" type="2d" file="sb_booth_t06.png"/>
+    <material name="sb_booth_mat06" texture="sb_booth_tex06" reflectance="0.5" specular="0.5" shininess="0.5"/>
+    <mesh name="sb_booth_mesh07" file="sb_booth_m07.obj"/>
+    <texture name="sb_booth_tex07" type="2d" file="sb_booth_t07.png"/>
+    <material name="sb_booth_mat07" texture="sb_booth_tex07" reflectance="0.5" specular="0.5" shininess="0.5"/>
+  </asset>
+
+  <worldbody>
+    <geom name="floor" type="box" pos="0 -0.6096 -0.01" size="11 7.9146 0.01" material="floor_wood"/>
+
+    <geom name="back_wall"  type="box" pos="0 6.8 1.6"  size="11 0.12 1.6" material="wall"/>
+    <geom name="left_wall"  type="box" pos="-10.8 -0.6096 1.6" size="0.12 7.9146 1.6" material="wall"/>
+    <geom name="right_wall" type="box" pos="10.8 -0.6096 1.6" size="0.12 7.9146 1.6" material="wall"/>
+    <geom name="sign_board" type="box" pos="0 6.65 2.25" size="1.5 0.06 0.35" rgba="0.08 0.06 0.04 1"/>
+
+    <geom name="bar_long" type="box" pos="-8.35 -1.167 0.50" size="0.36 2.30 0.50" material="bar_wood"/>
+    <geom name="bar_back" type="box" pos="-7.15 1.083 0.50" size="1.20 0.35 0.50" material="bar_wood"/>
+    <geom name="bar_top_long" type="box" pos="-7.95 -1.167 1.03" size="0.78 2.34 0.05" material="table_top"/>
+    <geom name="bar_top_back" type="box" pos="-7.15 1.083 1.03" size="1.20 0.78 0.05" material="table_top"/>
+    <geom name="bar_kick_rail" type="capsule" fromto="-7.52 -3.117 0.22 -7.52 0.783 0.22" size="0.045" material="dark_metal"/>
+    <geom name="stool_1" type="cylinder" pos="-6.55 -2.767 0.62" size="0.19 0.06" material="dark_metal"/>
+    <geom name="stool_2" type="cylinder" pos="-6.55 -1.667 0.62" size="0.19 0.06" material="dark_metal"/>
+    <geom name="stool_3" type="cylinder" pos="-6.55 -0.567 0.62" size="0.19 0.06" material="dark_metal"/>
+    <geom name="stool_4" type="cylinder" pos="-6.55 0.533 0.62" size="0.19 0.06" material="dark_metal"/>
+
+    <!-- big central table removed — replaced by booth_inst_* row below -->
+    <geom name="booth_divider" type="box" pos="-0.4692 -3.2008 0.55" size="0.08 4.2 0.55" material="wall"/>
+    <!-- Booth row: ~4 ft further from kitchen (−Y) than prior layout -->
+    <body name="booth_inst_0" pos="-1.2192 -0.3056 0.42" euler="0 0 0">
+      <geom name="booth0_g00" type="mesh" mesh="sb_booth_mesh00" material="sb_booth_mat00" contype="0" conaffinity="0"/>
+      <geom name="booth0_g01" type="mesh" mesh="sb_booth_mesh01" material="sb_booth_mat01" contype="0" conaffinity="0"/>
+      <geom name="booth0_g02" type="mesh" mesh="sb_booth_mesh02" material="sb_booth_mat02" contype="0" conaffinity="0"/>
+      <geom name="booth0_g03" type="mesh" mesh="sb_booth_mesh03" material="sb_booth_mat03" contype="0" conaffinity="0"/>
+      <geom name="booth0_g04" type="mesh" mesh="sb_booth_mesh04" material="sb_booth_mat04" contype="0" conaffinity="0"/>
+      <geom name="booth0_g05" type="mesh" mesh="sb_booth_mesh05" material="sb_booth_mat05" contype="0" conaffinity="0"/>
+      <geom name="booth0_g06" type="mesh" mesh="sb_booth_mesh06" material="sb_booth_mat06" contype="0" conaffinity="0"/>
+      <geom name="booth0_g07" type="mesh" mesh="sb_booth_mesh07" material="sb_booth_mat07" contype="0" conaffinity="0"/>
+    </body>
+    <body name="booth_inst_1" pos="-1.2192 -3.2008 0.42" euler="0 0 0">
+      <geom name="booth1_g00" type="mesh" mesh="sb_booth_mesh00" material="sb_booth_mat00" contype="0" conaffinity="0"/>
+      <geom name="booth1_g01" type="mesh" mesh="sb_booth_mesh01" material="sb_booth_mat01" contype="0" conaffinity="0"/>
+      <geom name="booth1_g02" type="mesh" mesh="sb_booth_mesh02" material="sb_booth_mat02" contype="0" conaffinity="0"/>
+      <geom name="booth1_g03" type="mesh" mesh="sb_booth_mesh03" material="sb_booth_mat03" contype="0" conaffinity="0"/>
+      <geom name="booth1_g04" type="mesh" mesh="sb_booth_mesh04" material="sb_booth_mat04" contype="0" conaffinity="0"/>
+      <geom name="booth1_g05" type="mesh" mesh="sb_booth_mesh05" material="sb_booth_mat05" contype="0" conaffinity="0"/>
+      <geom name="booth1_g06" type="mesh" mesh="sb_booth_mesh06" material="sb_booth_mat06" contype="0" conaffinity="0"/>
+      <geom name="booth1_g07" type="mesh" mesh="sb_booth_mesh07" material="sb_booth_mat07" contype="0" conaffinity="0"/>
+    </body>
+    <body name="booth_inst_2" pos="-1.2192 -6.096 0.42" euler="0 0 0">
+      <geom name="booth2_g00" type="mesh" mesh="sb_booth_mesh00" material="sb_booth_mat00" contype="0" conaffinity="0"/>
+      <geom name="booth2_g01" type="mesh" mesh="sb_booth_mesh01" material="sb_booth_mat01" contype="0" conaffinity="0"/>
+      <geom name="booth2_g02" type="mesh" mesh="sb_booth_mesh02" material="sb_booth_mat02" contype="0" conaffinity="0"/>
+      <geom name="booth2_g03" type="mesh" mesh="sb_booth_mesh03" material="sb_booth_mat03" contype="0" conaffinity="0"/>
+      <geom name="booth2_g04" type="mesh" mesh="sb_booth_mesh04" material="sb_booth_mat04" contype="0" conaffinity="0"/>
+      <geom name="booth2_g05" type="mesh" mesh="sb_booth_mesh05" material="sb_booth_mat05" contype="0" conaffinity="0"/>
+      <geom name="booth2_g06" type="mesh" mesh="sb_booth_mesh06" material="sb_booth_mat06" contype="0" conaffinity="0"/>
+      <geom name="booth2_g07" type="mesh" mesh="sb_booth_mesh07" material="sb_booth_mat07" contype="0" conaffinity="0"/>
+    </body>
+
+    <geom name="kitchen_divider_left"  type="box" pos="-9.0 3.0 1.2" size="2.6 0.08 1.2" material="wall"/>
+    <geom name="kitchen_divider_right" type="box" pos="-1.2 3.0 1.2" size="2.0 0.08 1.2" material="wall"/>
+    <geom name="kitchen_post_left"  type="box" pos="-6.3 3.0 1.2" size="0.08 0.08 1.2" material="dark_metal"/>
+    <geom name="kitchen_post_right" type="box" pos="-3.2 3.0 1.2" size="0.08 0.08 1.2" material="dark_metal"/>
+    <geom name="kitchen_counter_back" type="box" pos="-8.0 6.0 0.55" size="3.4 0.45 0.55" material="bar_wood"/>
+    <geom name="kitchen_counter_left" type="box" pos="-9.8 5.2 0.55" size="0.45 1.85 0.55" material="bar_wood"/>
+    <geom name="kitchen_island" type="box" pos="-8.2 4.3 0.55" size="0.8 0.5 0.55" material="light_gray"/>
+
+    <geom name="blue_target_table_top" type="box" pos="-3.98 -1.85 0.72" size="1.2 0.75 0.06" material="blue_target"/>
+    <geom name="blue_target_leg_1" type="box" pos="-4.93 -2.45 0.36" size="0.04 0.04 0.36" material="dark_metal"/>
+    <geom name="blue_target_leg_2" type="box" pos="-3.03 -2.45 0.36" size="0.04 0.04 0.36" material="dark_metal"/>
+    <geom name="blue_target_leg_3" type="box" pos="-4.93 -1.25 0.36" size="0.04 0.04 0.36" material="dark_metal"/>
+    <geom name="blue_target_leg_4" type="box" pos="-3.03 -1.25 0.36" size="0.04 0.04 0.36" material="dark_metal"/>
+
+    <!-- Cube on middle booth row -->
+    <body name="target_block" pos="-1.6392 -3.2692 1.12">
+      <freejoint/>
+      <geom name="target_block_geom" type="box" size="0.14 0.14 0.14" material="blue_target"
+            density="5" friction="3.0 0.1 0.005"/>
+    </body>
+
+    <!-- Plates / cups (same geometry as g1_gear_wbc_stylish_diner): booth tables, bar cups, blue prep table -->
+    <body name="pv_plate_booth_a" pos="-1.3992 -0.2192 0.732">
+      <freejoint/>
+      <geom name="pv_plate_ba_base" type="cylinder" size="0.11 0.008" material="ceramic_white"
+            density="350" friction="0.9 0.02 0.002"/>
+      <geom name="pv_plate_ba_rim" type="cylinder" pos="0 0 0.004" size="0.125 0.004" material="ceramic_white"
+            density="350" friction="0.9 0.02 0.002"/>
+    </body>
+    <body name="pv_cup_booth_a" pos="-1.0992 -0.0392 0.77">
+      <joint type="free" damping="0.35"/>
+      <geom name="pv_cup_ba_body" type="cylinder" size="0.042 0.050" material="ceramic_white"
+            density="1400" friction="1.4 0.06 0.006" margin="0.002"
+            solref="0.02 1" solimp="0.95 0.99 0.001"/>
+      <geom name="pv_cup_ba_base" type="cylinder" pos="0 0 -0.042" size="0.028 0.008" material="ceramic_white"
+            density="1400" contype="0" conaffinity="0"/>
+      <geom name="pv_cup_ba_handle" type="capsule" fromto="0.045 0 0.010 0.045 0 -0.030" size="0.007"
+            material="ceramic_white" density="1400" friction="0.9 0.02 0.002" contype="0" conaffinity="0"/>
+    </body>
+    <body name="pv_cup_booth_b" pos="-1.0992 -3.0892 0.77">
+      <joint type="free" damping="0.35"/>
+      <geom name="pv_cup_bb_body" type="cylinder" size="0.042 0.050" material="ceramic_white"
+            density="1400" friction="1.4 0.06 0.006" margin="0.002"
+            solref="0.02 1" solimp="0.95 0.99 0.001"/>
+      <geom name="pv_cup_bb_base" type="cylinder" pos="0 0 -0.042" size="0.028 0.008" material="ceramic_white"
+            density="1400" contype="0" conaffinity="0"/>
+      <geom name="pv_cup_bb_handle" type="capsule" fromto="0.045 0 0.010 0.045 0 -0.030" size="0.007"
+            material="ceramic_white" density="1400" friction="0.9 0.02 0.002" contype="0" conaffinity="0"/>
+    </body>
+    <body name="pv_plate_booth_c" pos="-1.3992 -6.2692 0.732">
+      <freejoint/>
+      <geom name="pv_plate_bc_base" type="cylinder" size="0.11 0.008" material="ceramic_white"
+            density="350" friction="0.9 0.02 0.002"/>
+      <geom name="pv_plate_bc_rim" type="cylinder" pos="0 0 0.004" size="0.125 0.004" material="ceramic_white"
+            density="350" friction="0.9 0.02 0.002"/>
+    </body>
+    <body name="pv_cup_booth_c" pos="-1.0992 -6.0892 0.77">
+      <joint type="free" damping="0.35"/>
+      <geom name="pv_cup_bc_body" type="cylinder" size="0.042 0.050" material="ceramic_white"
+            density="1400" friction="1.4 0.06 0.006" margin="0.002"
+            solref="0.02 1" solimp="0.95 0.99 0.001"/>
+      <geom name="pv_cup_bc_base" type="cylinder" pos="0 0 -0.042" size="0.028 0.008" material="ceramic_white"
+            density="1400" contype="0" conaffinity="0"/>
+      <geom name="pv_cup_bc_handle" type="capsule" fromto="0.045 0 0.010 0.045 0 -0.030" size="0.007"
+            material="ceramic_white" density="1400" friction="0.9 0.02 0.002" contype="0" conaffinity="0"/>
+    </body>
+    <body name="pv_cup_bar_1" pos="-7.35 -0.15 1.13">
+      <joint type="free" damping="0.35"/>
+      <geom name="pv_cup_b1_body" type="cylinder" size="0.042 0.050" material="ceramic_white"
+            density="1400" friction="1.4 0.06 0.006" margin="0.002"
+            solref="0.02 1" solimp="0.95 0.99 0.001"/>
+      <geom name="pv_cup_b1_base" type="cylinder" pos="0 0 -0.042" size="0.028 0.008" material="ceramic_white"
+            density="1400" contype="0" conaffinity="0"/>
+      <geom name="pv_cup_b1_handle" type="capsule" fromto="0.045 0 0.010 0.045 0 -0.030" size="0.007"
+            material="ceramic_white" density="1400" friction="0.9 0.02 0.002" contype="0" conaffinity="0"/>
+    </body>
+    <body name="pv_cup_bar_2" pos="-7.35 1.05 1.13">
+      <joint type="free" damping="0.35"/>
+      <geom name="pv_cup_b2_body" type="cylinder" size="0.042 0.050" material="ceramic_white"
+            density="1400" friction="1.4 0.06 0.006" margin="0.002"
+            solref="0.02 1" solimp="0.95 0.99 0.001"/>
+      <geom name="pv_cup_b2_base" type="cylinder" pos="0 0 -0.042" size="0.028 0.008" material="ceramic_white"
+            density="1400" contype="0" conaffinity="0"/>
+      <geom name="pv_cup_b2_handle" type="capsule" fromto="0.045 0 0.010 0.045 0 -0.030" size="0.007"
+            material="ceramic_white" density="1400" friction="0.9 0.02 0.002" contype="0" conaffinity="0"/>
+    </body>
+    <light name="light_1" pos="-5.0 0.0 3.8" dir="0 0 -1" diffuse="0.88 0.70 0.42" specular="0.03 0.025 0.02"/>
+    <light name="light_2" pos="0.0 0.5 3.8"  dir="0 0 -1" diffuse="0.88 0.70 0.42" specular="0.03 0.025 0.02"/>
+    <light name="light_3" pos="5.5 1.2 3.8"  dir="0 0 -1" diffuse="0.88 0.70 0.42" specular="0.03 0.025 0.02"/>
+    <light name="light_4" pos="-6.0 5.0 3.8" dir="0 0 -1" diffuse="0.82 0.82 0.90" specular="0.04 0.04 0.05"/>
+  </worldbody>
+</mujoco>
